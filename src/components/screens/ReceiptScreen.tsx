@@ -83,7 +83,19 @@ export const ReceiptScreen: React.FC<ReceiptScreenProps> = ({
 
         {/* Totals & Payment Breakdown */}
         <div className="py-4 border-b-2 border-dashed border-[#252422] space-y-2">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between text-sm font-mono text-[#403d39]">
+            <span>Subtotal:</span>
+            <span className="tabular-nums">{formatCurrency(transaction.subtotalAmountCentavos)}</span>
+          </div>
+
+          {transaction.discountAmountCentavos > 0 && (
+            <div className="flex items-center justify-between text-sm font-mono text-[#eb5e28] font-bold">
+              <span>Discount (20%):</span>
+              <span className="tabular-nums">-{formatCurrency(transaction.discountAmountCentavos)}</span>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between pt-2">
             <span className="handwritten text-3xl font-bold text-[#252422]">TOTAL:</span>
             <span className="font-mono text-2xl font-bold text-[#eb5e28] tabular-nums">
               {formatCurrency(transaction.totalAmountCentavos)}

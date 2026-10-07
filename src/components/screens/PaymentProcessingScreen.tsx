@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from 'react';
-import { PaymentMethod } from '../../types/pos';
+import { DiningOption, OrderItem, PaymentMethod } from '../../types/pos';
 import { centavosToPesos, formatCurrency } from '../../utils/currency';
 import { validateCashPayment } from '../../utils/validation';
 import { ProgressIndicator } from '../ui/ProgressIndicator';
+import { PaymentConfirmationDialog } from '../ui/PaymentConfirmationDialog';
 import {
   ArrowLeft,
   Banknote,
@@ -15,7 +16,11 @@ import {
 } from 'lucide-react';
 
 interface PaymentProcessingScreenProps {
+  cartItems: OrderItem[];
+  diningOption: DiningOption;
   paymentMethod: PaymentMethod;
+  subtotalAmountCentavos: number;
+  discountAmountCentavos: number;
   totalAmountCentavos: number;
   cashInput: string;
   onChangeCashInput: (value: string) => void;
@@ -64,7 +69,11 @@ function buildSimulatedQrMatrix(seedText: string): boolean[][] {
 }
 
 export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = ({
+  cartItems,
+  diningOption,
   paymentMethod,
+  subtotalAmountCentavos,
+  discountAmountCentavos,
   totalAmountCentavos,
   cashInput,
   onChangeCashInput,
@@ -73,6 +82,10 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
 }) => {
   const [validationError, setValidationError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [pendingConfirmation, setPendingConfirmation] = useState<{
+    amountPaidCentavos: number;
+    changeCentavos: number;
+  } | null>(null);
 
   const liveCashPreview = useMemo(() => {
     if (cashInput.trim().length === 0) {
@@ -123,7 +136,8 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
     onChangeCashInput(pesosAmount.toFixed(2).replace(/\.00$/, ''));
   };
 
-  const handleCashSubmit = async (e: React.FormEvent) => {
+  // Step 1: Validate input and open Confirmation Dialog
+  const handleCashSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const check = validateCashPayment(cashInput, totalAmountCentavos);
     if (!check.valid) {
@@ -132,42 +146,52 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
     }
 
     setValidationError(null);
+    setPendingConfirmation({
+      amountPaidCentavos: check.amountPaidCentavos,
+      changeCentavos: check.changeCentavos,
+    });
+  };
+
+  const handleQrInitiate = () => {
+    setValidationError(null);
+    setPendingConfirmation({
+      amountPaidCentavos: totalAmountCentavos,
+      changeCentavos: 0,
+    });
+  };
+
+  const handleCardInitiate = () => {
+    setValidationError(null);
+    setPendingConfirmation({
+      amountPaidCentavos: totalAmountCentavos,
+      changeCentavos: 0,
+    });
+  };
+
+  // Step 2: Confirmed in Dialog -> Run simulation delay (if QR/Card) and save transaction
+  const handleFinalConfirmPayment = async () => {
+    if (!pendingConfirmation) return;
+    setValidationError(null);
     setIsProcessing(true);
+
     try {
-      await onCompletePayment(check.amountPaidCentavos, check.changeCentavos);
+      if (paymentMethod === 'QR Payment') {
+        await new Promise((resolve) => setTimeout(resolve, 650));
+      } else if (paymentMethod === 'Credit/Debit Card') {
+        await new Promise((resolve) => setTimeout(resolve, 1100));
+      }
+
+      await onCompletePayment(
+        pendingConfirmation.amountPaidCentavos,
+        pendingConfirmation.changeCentavos
+      );
+      setPendingConfirmation(null);
     } catch (err) {
       setValidationError(
         err instanceof Error ? err.message : 'Unable to complete transaction. Please try again.'
       );
       setIsProcessing(false);
-    }
-  };
-
-  const handleSimulatedQrConfirm = async () => {
-    setValidationError(null);
-    setIsProcessing(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 650));
-      await onCompletePayment(totalAmountCentavos, 0);
-    } catch (err) {
-      setValidationError(
-        err instanceof Error ? err.message : 'Unable to complete QR payment. Please try again.'
-      );
-      setIsProcessing(false);
-    }
-  };
-
-  const handleSimulatedCardProcess = async () => {
-    setValidationError(null);
-    setIsProcessing(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1100));
-      await onCompletePayment(totalAmountCentavos, 0);
-    } catch (err) {
-      setValidationError(
-        err instanceof Error ? err.message : 'Unable to process card payment. Please try again.'
-      );
-      setIsProcessing(false);
+      setPendingConfirmation(null);
     }
   };
 
@@ -368,17 +392,8 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
                 disabled={isProcessing}
                 className="min-h-[58px] px-10 py-3.5 rounded-2xl ink-btn-accent handwritten text-3xl font-bold inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
               >
-                {isProcessing ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Recording Transaction...</span>
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle2 className="w-6 h-6" />
-                    <span>Pay Now ({formatCurrency(totalAmountCentavos)})</span>
-                  </>
-                )}
+                <CheckCircle2 className="w-6 h-6" />
+                <span>Pay Now ({formatCurrency(totalAmountCentavos)})</span>
               </button>
             </div>
           </form>
@@ -430,7 +445,7 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
 
               <p className="text-sm text-[#403d39] mt-3 max-w-md leading-relaxed">
                 Scan this QR code using any supported e-wallet or mobile banking application, then tap{' '}
-                <strong className="text-[#252422]">Confirm Payment</strong> below to complete your order.
+                <strong className="text-[#252422]">Confirm Payment</strong> below to review and complete your order.
               </p>
             </div>
 
@@ -458,20 +473,11 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
               <button
                 type="button"
                 disabled={isProcessing}
-                onClick={handleSimulatedQrConfirm}
+                onClick={handleQrInitiate}
                 className="min-h-[58px] px-8 py-3.5 rounded-2xl ink-btn-accent handwritten text-3xl font-bold inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
               >
-                {isProcessing ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Verifying QR Payment...</span>
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle2 className="w-6 h-6" />
-                    <span>Confirm Payment</span>
-                  </>
-                )}
+                <CheckCircle2 className="w-6 h-6" />
+                <span>Confirm Payment</span>
               </button>
             </div>
           </div>
@@ -533,25 +539,34 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
               <button
                 type="button"
                 disabled={isProcessing}
-                onClick={handleSimulatedCardProcess}
+                onClick={handleCardInitiate}
                 className="min-h-[58px] px-8 py-3.5 rounded-2xl ink-btn-accent handwritten text-3xl font-bold inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
               >
-                {isProcessing ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Processing payment...</span>
-                  </>
-                ) : (
-                  <>
-                    <CreditCard className="w-6 h-6" />
-                    <span>Process Payment</span>
-                  </>
-                )}
+                <CreditCard className="w-6 h-6" />
+                <span>Process Payment</span>
               </button>
             </div>
           </div>
         )}
       </div>
+
+      {/* Reusable Payment Confirmation Dialog */}
+      <PaymentConfirmationDialog
+        isOpen={Boolean(pendingConfirmation)}
+        cartItems={cartItems}
+        diningOption={diningOption}
+        paymentMethod={paymentMethod}
+        subtotalAmountCentavos={subtotalAmountCentavos}
+        discountAmountCentavos={discountAmountCentavos}
+        totalAmountCentavos={totalAmountCentavos}
+        amountPaidCentavos={pendingConfirmation?.amountPaidCentavos || 0}
+        changeCentavos={pendingConfirmation?.changeCentavos || 0}
+        isSubmitting={isProcessing}
+        onCancel={() => {
+          if (!isProcessing) setPendingConfirmation(null);
+        }}
+        onConfirm={handleFinalConfirmPayment}
+      />
     </div>
   );
 };

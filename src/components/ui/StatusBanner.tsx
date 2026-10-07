@@ -17,7 +17,7 @@ export const StatusBanner: React.FC<StatusBannerProps> = ({ toast, onDismiss }) 
     <div
       role="status"
       aria-live="polite"
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 max-w-lg w-[calc(100%-2rem)] no-print pointer-events-auto"
+      className="fixed top-24 right-4 sm:right-8 z-50 max-w-md w-[calc(100%-2rem)] sm:w-auto no-print pointer-events-auto"
     >
       <div
         className={`flex items-center justify-between gap-3 px-5 py-3.5 rounded-2xl border-[3px] border-[#252422] shadow-[4px_4px_0_#252422] transition-all duration-150 ${

@@ -371,7 +371,7 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col bg-[#fffcf2] text-[#252422]">
       {/* Header matching Variation 3 */}
-      <header className="bg-[#fffcf2] border-b-[3px] border-[#252422] px-6 sm:px-12 py-5 flex items-center justify-between gap-4 no-print">
+      <header className="bg-[#fffcf2] border-b-[3px] border-[#252422] px-6 sm:px-12 py-5 flex flex-wrap items-center justify-between gap-4 no-print">
         {/* Brand Logo */}
         <a
           href="#kiosk-top"
@@ -464,8 +464,12 @@ export default function App() {
             {stage === 'ORDER_SUMMARY' && (
               <OrderSummaryScreen
                 cartItems={cartItems}
+                subtotalAmountCentavos={subtotalAmountCentavos}
+                discountAmountCentavos={discountAmountCentavos}
                 totalAmountCentavos={totalAmountCentavos}
                 totalItemCount={totalItemCount}
+                isSeniorPwd={isSeniorPwd}
+                onToggleDiscount={setIsSeniorPwd}
                 diningOption={diningOption}
                 onChangeDiningOption={setDiningOption}
                 onBackToSelection={handleBackToSelection}
@@ -482,7 +486,11 @@ export default function App() {
             )}
             {stage === 'PAYMENT_PROCESSING' && selectedPaymentMethod && (
               <PaymentProcessingScreen
+                cartItems={cartItems}
+                diningOption={diningOption}
                 paymentMethod={selectedPaymentMethod}
+                subtotalAmountCentavos={subtotalAmountCentavos}
+                discountAmountCentavos={discountAmountCentavos}
                 totalAmountCentavos={totalAmountCentavos}
                 cashInput={cashInput}
                 onChangeCashInput={setCashInput}

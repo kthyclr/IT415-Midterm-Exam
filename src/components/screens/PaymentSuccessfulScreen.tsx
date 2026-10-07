@@ -61,8 +61,24 @@ export const PaymentSuccessfulScreen: React.FC<PaymentSuccessfulScreenProps> = (
           </div>
 
           <div className="py-2.5 flex items-center justify-between text-sm">
-            <span className="kiosk-label">Transaction Amount</span>
+            <span className="kiosk-label">Subtotal</span>
             <span className="font-mono font-bold text-[#252422] tabular-nums">
+              {formatCurrency(transaction.subtotalAmountCentavos)}
+            </span>
+          </div>
+
+          {transaction.discountAmountCentavos > 0 && (
+            <div className="py-2.5 flex items-center justify-between text-sm">
+              <span className="kiosk-label text-[#eb5e28]">Discount (20%)</span>
+              <span className="font-mono font-bold text-[#eb5e28] tabular-nums">
+                -{formatCurrency(transaction.discountAmountCentavos)}
+              </span>
+            </div>
+          )}
+
+          <div className="py-2.5 flex items-center justify-between text-sm">
+            <span className="kiosk-label">Total Amount</span>
+            <span className="font-mono font-bold text-[#eb5e28] tabular-nums text-lg">
               {formatCurrency(transaction.totalAmountCentavos)}
             </span>
           </div>
