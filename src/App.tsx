@@ -2,7 +2,6 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from './firebase/config';
@@ -19,6 +18,8 @@ import {
   StatusToast,
 } from './types/pos';
 import {
+  calculateDiscountCentavos,
+  calculateFinalTotalCentavos,
   calculateItemSubtotal,
   calculateOrderTotal,
   calculateTotalQuantity,
@@ -50,6 +51,7 @@ export default function App() {
   // 2. Authoritative Transaction / Cart State
   const [stage, setStage] = useState<KioskStage>('ITEM_SELECTION');
   const [cartItems, setCartItems] = useState<OrderItem[]>([]);
+  const [isSeniorPwd, setIsSeniorPwd] = useState<boolean>(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<PaymentMethod | null>(null);
   const [cashInput, setCashInput] = useState<string>('');
@@ -138,10 +140,20 @@ export default function App() {
     }
   };
 
-  // Authoritative Computed Totals
-  const totalAmountCentavos = useMemo(
+  // Authoritative Computed Totals with 20% Discount
+  const subtotalAmountCentavos = useMemo(
     () => calculateOrderTotal(cartItems),
     [cartItems]
+  );
+
+  const discountAmountCentavos = useMemo(
+    () => calculateDiscountCentavos(subtotalAmountCentavos, isSeniorPwd),
+    [subtotalAmountCentavos, isSeniorPwd]
+  );
+
+  const totalAmountCentavos = useMemo(
+    () => calculateFinalTotalCentavos(subtotalAmountCentavos, discountAmountCentavos),
+    [subtotalAmountCentavos, discountAmountCentavos]
   );
 
   const totalItemCount = useMemo(
@@ -164,12 +176,10 @@ export default function App() {
           };
           return [...prev, newItem];
         }
-
         const existing = prev[existingIndex];
         const nextQty = existing.quantity + 1;
         const check = validateQuantityChange(nextQty);
         if (!check.valid) return prev;
-
         const updated: OrderItem = {
           ...existing,
           quantity: nextQty,
@@ -182,7 +192,6 @@ export default function App() {
         copy[existingIndex] = updated;
         return copy;
       });
-
       showNotification(
         'success',
         `Product added: ${product.name} (${formatCurrency(product.priceCentavos)})`
@@ -220,18 +229,14 @@ export default function App() {
     (productId: string) => {
       let removedItemName: string | null = null;
       let updatedItemName: string | null = null;
-
       setCartItems((prev) => {
         const target = prev.find((i) => i.productId === productId);
         if (!target) return prev;
-
         const nextQty = target.quantity - 1;
-        // Quantity must never become negative; if it reaches 0, remove item cleanly
         if (nextQty <= 0) {
           removedItemName = target.productName;
           return prev.filter((i) => i.productId !== productId);
         }
-
         updatedItemName = target.productName;
         return prev.map((item) =>
           item.productId === productId
@@ -246,7 +251,6 @@ export default function App() {
             : item
         );
       });
-
       if (removedItemName) {
         showNotification('info', `Removed ${removedItemName} from order.`);
       } else if (updatedItemName) {
@@ -270,6 +274,7 @@ export default function App() {
   // Complete Transaction Reset (New Transaction)
   const handleStartNewTransaction = useCallback(() => {
     setCartItems([]);
+    setIsSeniorPwd(false);
     setSelectedPaymentMethod(null);
     setCashInput('');
     setCompletedTransaction(null);
@@ -324,23 +329,23 @@ export default function App() {
     if (!cartCheck.valid) {
       throw new Error(cartCheck.errorMessage || 'Your cart is empty.');
     }
-
     const methodCheck = validatePaymentMethod(selectedPaymentMethod);
     if (!methodCheck.valid || !selectedPaymentMethod) {
       throw new Error(
         methodCheck.errorMessage || 'Please select a valid payment method.'
       );
     }
-
     const transactionId = generateTransactionReference();
     const createdAtIso = new Date().toISOString();
     const snapshotItems: OrderItem[] = cartItems.map((item) => ({ ...item }));
-
     const txRecord: Omit<CompletedTransaction, 'persistedToFirestore'> = {
       transactionId,
       createdAtIso,
       itemCount: totalItemCount,
       items: snapshotItems,
+      subtotalAmountCentavos,
+      discountType: isSeniorPwd ? 'SENIOR_PWD' : 'NONE',
+      discountAmountCentavos,
       totalAmountCentavos,
       paymentMethod: selectedPaymentMethod,
       amountPaidCentavos,
@@ -350,12 +355,10 @@ export default function App() {
 
     // Persist to Cloud Firestore
     await saveCompletedTransactionToFirestore(txRecord);
-
     const authoritativeCompleted: CompletedTransaction = {
       ...txRecord,
       persistedToFirestore: true,
     };
-
     setCompletedTransaction(authoritativeCompleted);
     setStage('PAYMENT_SUCCESSFUL');
     showNotification('success', 'Payment completed successfully.');
@@ -381,7 +384,6 @@ export default function App() {
             Ate &amp; Served
           </span>
         </a>
-
         {/* Navigation Controls */}
         <div className="flex items-center gap-3">
           <button
@@ -400,7 +402,6 @@ export default function App() {
               {showAdminPortal ? 'Kiosk' : 'Admin'}
             </span>
           </button>
-
           <button
             type="button"
             onClick={toggleKioskFullscreen}
@@ -414,7 +415,6 @@ export default function App() {
               <Maximize2 className="w-5 h-5" />
             )}
           </button>
-
           <button
             type="button"
             onClick={() => {
@@ -457,7 +457,6 @@ export default function App() {
                 onProceedToSummary={handleProceedToSummary}
               />
             )}
-
             {stage === 'ORDER_SUMMARY' && (
               <OrderSummaryScreen
                 cartItems={cartItems}
@@ -467,7 +466,6 @@ export default function App() {
                 onContinueToPayment={handleContinueToPaymentMethod}
               />
             )}
-
             {stage === 'PAYMENT_METHOD' && (
               <PaymentMethodScreen
                 totalAmountCentavos={totalAmountCentavos}
@@ -476,7 +474,6 @@ export default function App() {
                 onBackToSummary={() => setStage('ORDER_SUMMARY')}
               />
             )}
-
             {stage === 'PAYMENT_PROCESSING' && selectedPaymentMethod && (
               <PaymentProcessingScreen
                 paymentMethod={selectedPaymentMethod}
@@ -487,7 +484,6 @@ export default function App() {
                 onCompletePayment={handleCompletePayment}
               />
             )}
-
             {stage === 'PAYMENT_SUCCESSFUL' && completedTransaction && (
               <PaymentSuccessfulScreen
                 transaction={completedTransaction}
@@ -495,7 +491,6 @@ export default function App() {
                 onStartNewTransaction={handleStartNewTransaction}
               />
             )}
-
             {stage === 'RECEIPT' && completedTransaction && (
               <ReceiptScreen
                 transaction={completedTransaction}
@@ -511,4 +506,3 @@ export default function App() {
     </div>
   );
 }
-

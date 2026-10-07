@@ -2,6 +2,8 @@ export type ProductCategory = 'Drinks' | 'Food' | 'Snacks' | 'Merch';
 
 export type FilterCategory = 'All' | ProductCategory;
 
+export type DiscountType = 'NONE' | 'SENIOR_PWD';
+
 export interface Product {
   id: string;
   name: string;
@@ -37,6 +39,9 @@ export interface CompletedTransaction {
   createdAtIso: string;
   itemCount: number;
   items: OrderItem[];
+  subtotalAmountCentavos: number;
+  discountType: DiscountType;
+  discountAmountCentavos: number;
   totalAmountCentavos: number;
   paymentMethod: PaymentMethod;
   amountPaidCentavos: number;
