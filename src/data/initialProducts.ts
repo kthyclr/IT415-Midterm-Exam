@@ -1,21 +1,34 @@
 import { Product } from '../types/pos';
+import coffeeImg from '../assets/images/product_coffee_cup_1791355690264.jpg';
+import sandwichImg from '../assets/images/product_club_sandwich_1791355702044.jpg';
+import softdrinkImg from '../assets/images/product_cola_drink_1791355713747.jpg';
+import cookiesImg from '../assets/images/product_choco_cookies_1791355724440.jpg';
+import waterImg from '../assets/images/product_spring_water_1791355735212.jpg';
+import chocolateImg from '../assets/images/product_chocolate_bar_1791355747552.jpg';
+import tumblerImg from '../assets/images/product_campus_tumbler_1791355760751.jpg';
+import lanyardImg from '../assets/images/product_id_lanyard_1791355772082.jpg';
 
 /**
- * Default Product Images Map (Generated Studio Photography)
+ * Default Product Images Map (Bundled by Vite for both dev and deployed production builds)
  */
 export const DEFAULT_PRODUCT_IMAGES: Record<string, string> = {
-  'prod-coffee': '/src/assets/images/product_coffee_cup_1791355690264.jpg',
-  'prod-sandwich': '/src/assets/images/product_club_sandwich_1791355702044.jpg',
-  'prod-softdrink': '/src/assets/images/product_cola_drink_1791355713747.jpg',
-  'prod-cookies': '/src/assets/images/product_choco_cookies_1791355724440.jpg',
-  'prod-water': '/src/assets/images/product_spring_water_1791355735212.jpg',
-  'prod-chocolate': '/src/assets/images/product_chocolate_bar_1791355747552.jpg',
-  'prod-tumbler': '/src/assets/images/product_campus_tumbler_1791355760751.jpg',
-  'prod-lanyard': '/src/assets/images/product_id_lanyard_1791355772082.jpg',
+  'prod-coffee': coffeeImg,
+  'prod-sandwich': sandwichImg,
+  'prod-softdrink': softdrinkImg,
+  'prod-cookies': cookiesImg,
+  'prod-water': waterImg,
+  'prod-chocolate': chocolateImg,
+  'prod-tumbler': tumblerImg,
+  'prod-lanyard': lanyardImg,
 };
 
 export function resolveProductImage(product: Pick<Product, 'id' | 'name' | 'category' | 'imageUrl'>): string {
-  if (product.imageUrl && product.imageUrl.trim().length > 0) {
+  // Always prefer bundled asset URLs if the stored imageUrl was an unbundled /src/assets/ string
+  if (
+    product.imageUrl &&
+    product.imageUrl.trim().length > 0 &&
+    !product.imageUrl.startsWith('/src/assets/')
+  ) {
     return product.imageUrl;
   }
   if (DEFAULT_PRODUCT_IMAGES[product.id]) {
