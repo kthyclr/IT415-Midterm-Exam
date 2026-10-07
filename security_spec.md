@@ -17,6 +17,7 @@
    - Only completed transactions (`status == 'Payment Successful'`) can be created.
    - `totalAmountCentavos` must be an integer `> 0` and `<= 50000000`.
    - `paymentMethod` must be one of `['Cash', 'QR Payment', 'Credit/Debit Card']`.
+   - `diningOption` must be one of `['Dine-In', 'Take-Out']`.
    - Payment arithmetic invariant:
      - If `paymentMethod == 'Cash'`, `amountPaidCentavos >= totalAmountCentavos` and `changeCentavos == amountPaidCentavos - totalAmountCentavos`.
      - If `paymentMethod == 'QR Payment'` or `'Credit/Debit Card'`, `amountPaidCentavos == totalAmountCentavos` and `changeCentavos == 0`.

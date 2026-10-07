@@ -26,6 +26,8 @@ export interface OrderItem {
 
 export type PaymentMethod = 'Cash' | 'QR Payment' | 'Credit/Debit Card';
 
+export type DiningOption = 'Dine-In' | 'Take-Out';
+
 export type KioskStage =
   | 'ITEM_SELECTION'
   | 'ORDER_SUMMARY'
@@ -44,6 +46,7 @@ export interface CompletedTransaction {
   discountAmountCentavos: number;
   totalAmountCentavos: number;
   paymentMethod: PaymentMethod;
+  diningOption: DiningOption;
   amountPaidCentavos: number;
   changeCentavos: number;
   status: 'Payment Successful';

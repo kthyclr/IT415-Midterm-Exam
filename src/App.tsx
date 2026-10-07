@@ -11,6 +11,7 @@ import {
 } from './firebase/posService';
 import {
   CompletedTransaction,
+  DiningOption,
   KioskStage,
   OrderItem,
   PaymentMethod,
@@ -52,6 +53,7 @@ export default function App() {
   const [stage, setStage] = useState<KioskStage>('ITEM_SELECTION');
   const [cartItems, setCartItems] = useState<OrderItem[]>([]);
   const [isSeniorPwd, setIsSeniorPwd] = useState<boolean>(false);
+  const [diningOption, setDiningOption] = useState<DiningOption>('Dine-In');
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<PaymentMethod | null>(null);
   const [cashInput, setCashInput] = useState<string>('');
@@ -275,6 +277,7 @@ export default function App() {
   const handleStartNewTransaction = useCallback(() => {
     setCartItems([]);
     setIsSeniorPwd(false);
+    setDiningOption('Dine-In');
     setSelectedPaymentMethod(null);
     setCashInput('');
     setCompletedTransaction(null);
@@ -348,6 +351,7 @@ export default function App() {
       discountAmountCentavos,
       totalAmountCentavos,
       paymentMethod: selectedPaymentMethod,
+      diningOption,
       amountPaidCentavos,
       changeCentavos,
       status: 'Payment Successful',
@@ -462,6 +466,8 @@ export default function App() {
                 cartItems={cartItems}
                 totalAmountCentavos={totalAmountCentavos}
                 totalItemCount={totalItemCount}
+                diningOption={diningOption}
+                onChangeDiningOption={setDiningOption}
                 onBackToSelection={handleBackToSelection}
                 onContinueToPayment={handleContinueToPaymentMethod}
               />

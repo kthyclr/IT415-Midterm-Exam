@@ -1,9 +1,10 @@
 import React from 'react';
-import { OrderItem } from '../../types/pos';
+import { DiningOption, OrderItem } from '../../types/pos';
 import { formatCurrency } from '../../utils/currency';
 import { ProgressIndicator } from '../ui/ProgressIndicator';
 import { DiscountToggle } from '../ui/DiscountToggle';
 import { ArrowLeft, ArrowRight, ClipboardCheck } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ClipboardCheck, Utensils, ShoppingBag, Check } from 'lucide-react';
 
 interface OrderSummaryScreenProps {
   cartItems: OrderItem[];
@@ -13,6 +14,8 @@ interface OrderSummaryScreenProps {
   totalItemCount: number;
   isSeniorPwd: boolean;
   onToggleDiscount: (enabled: boolean) => void;
+  diningOption: DiningOption;
+  onChangeDiningOption: (option: DiningOption) => void;
   onBackToSelection: () => void;
   onContinueToPayment: () => void;
 }
@@ -25,6 +28,8 @@ export const OrderSummaryScreen: React.FC<OrderSummaryScreenProps> = ({
   totalItemCount,
   isSeniorPwd,
   onToggleDiscount,
+  diningOption,
+  onChangeDiningOption,
   onBackToSelection,
   onContinueToPayment,
 }) => {
@@ -107,6 +112,101 @@ export const OrderSummaryScreen: React.FC<OrderSummaryScreenProps> = ({
           <div className="flex justify-between items-center text-sm font-mono text-[#403d39]">
             <span>Subtotal</span>
             <span>{formatCurrency(subtotalAmountCentavos)}</span>
+        {/* Dine-In vs. Take-Out Selection */}
+        <div className="my-6 p-5 bg-[#fffcf2] rounded-2xl border-2 border-[#252422]">
+          <span className="kiosk-label block mb-1">Dining Option</span>
+          <h3 className="handwritten text-2xl font-bold text-[#252422] mb-3">
+            How would you like your order?
+          </h3>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <button
+              type="button"
+              onClick={() => onChangeDiningOption('Dine-In')}
+              className={`p-4 rounded-xl border-2 transition-all cursor-pointer text-left flex items-center justify-between gap-3 ${
+                diningOption === 'Dine-In'
+                  ? 'bg-[#252422] text-white border-[#252422] shadow-[3px_3px_0_#eb5e28]'
+                  : 'bg-white text-[#252422] border-[#252422] hover:bg-[#fff0eb]'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className={`w-10 h-10 rounded-lg flex items-center justify-center border-2 ${
+                    diningOption === 'Dine-In'
+                      ? 'bg-[#eb5e28] text-white border-white'
+                      : 'bg-[#fff0eb] text-[#eb5e28] border-[#252422]'
+                  }`}
+                >
+                  <Utensils className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="handwritten text-2xl font-bold block leading-none">
+                    Eat In / Dine-In
+                  </span>
+                  <span
+                    className={`text-xs font-mono block mt-0.5 ${
+                      diningOption === 'Dine-In' ? 'text-white/80' : 'text-[#403d39]'
+                    }`}
+                  >
+                    Enjoy at the store tray
+                  </span>
+                </div>
+              </div>
+              {diningOption === 'Dine-In' && (
+                <div className="w-6 h-6 rounded-full bg-[#eb5e28] flex items-center justify-center text-white shrink-0">
+                  <Check className="w-4 h-4 stroke-[3]" />
+                </div>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onChangeDiningOption('Take-Out')}
+              className={`p-4 rounded-xl border-2 transition-all cursor-pointer text-left flex items-center justify-between gap-3 ${
+                diningOption === 'Take-Out'
+                  ? 'bg-[#252422] text-white border-[#252422] shadow-[3px_3px_0_#eb5e28]'
+                  : 'bg-white text-[#252422] border-[#252422] hover:bg-[#fff0eb]'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className={`w-10 h-10 rounded-lg flex items-center justify-center border-2 ${
+                    diningOption === 'Take-Out'
+                      ? 'bg-[#eb5e28] text-white border-white'
+                      : 'bg-[#fff0eb] text-[#eb5e28] border-[#252422]'
+                  }`}
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="handwritten text-2xl font-bold block leading-none">
+                    Takeout / To-Go
+                  </span>
+                  <span
+                    className={`text-xs font-mono block mt-0.5 ${
+                      diningOption === 'Take-Out' ? 'text-white/80' : 'text-[#403d39]'
+                    }`}
+                  >
+                    Packed for takeout
+                  </span>
+                </div>
+              </div>
+              {diningOption === 'Take-Out' && (
+                <div className="w-6 h-6 rounded-full bg-[#eb5e28] flex items-center justify-center text-white shrink-0">
+                  <Check className="w-4 h-4 stroke-[3]" />
+                </div>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Total Summary Box */}
+        <div className="bg-[#fffcf2] rounded-2xl p-5 border-2 border-[#252422] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <span className="kiosk-label block">Total Amount Due</span>
+            <span className="text-xs text-[#403d39]">
+              All prices are inclusive of applicable campus outlet taxes.
+            </span>
           </div>
 
           {isSeniorPwd && (

@@ -146,6 +146,7 @@ export async function saveCompletedTransactionToFirestore(
       items: sanitizedItems,
       totalAmountCentavos: Math.round(tx.totalAmountCentavos),
       paymentMethod: tx.paymentMethod,
+      diningOption: tx.diningOption || 'Dine-In',
       amountPaidCentavos: Math.round(tx.amountPaidCentavos),
       changeCentavos: Math.round(tx.changeCentavos),
       status: 'Payment Successful',
@@ -179,6 +180,7 @@ export async function fetchTransactionsForAdmin(): Promise<CompletedTransaction[
           data.paymentMethod === 'Credit/Debit Card'
             ? data.paymentMethod
             : 'Cash',
+        diningOption: data.diningOption === 'Take-Out' ? 'Take-Out' : 'Dine-In',
         amountPaidCentavos: Number(data.amountPaidCentavos || 0),
         changeCentavos: Number(data.changeCentavos || 0),
         status: 'Payment Successful',
