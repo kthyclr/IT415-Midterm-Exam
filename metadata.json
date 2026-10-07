@@ -1,0 +1,8 @@
+{
+  "name": "Sari-sari",
+  "description": "Self-service touchscreen Point-of-Sale (POS) kiosk system for a campus food and merchandise outlet with Firebase persistence, simulated QR/Card payments, and digital receipt generation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

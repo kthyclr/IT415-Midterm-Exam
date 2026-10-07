@@ -1,0 +1,207 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net: Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Primitive Helpers
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidTransactionId(id) {
+      return id is string && id.size() >= 10 && id.size() <= 64 && id.matches('^TXN-[0-9]{4}-[0-9A-Z\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isVerifiedUser() && (
+        request.auth.token.email == 'lauretokathyclaire@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isDefaultSeedProductId(productId) {
+      return productId in [
+        'prod-coffee',
+        'prod-sandwich',
+        'prod-softdrink',
+        'prod-cookies',
+        'prod-water',
+        'prod-chocolate',
+        'prod-tumbler',
+        'prod-lanyard'
+      ];
+    }
+
+    // Validation Blueprint: Product
+    function isValidProduct(data, productId) {
+      return data.keys().hasAll(['id', 'name', 'priceCentavos', 'category', 'description', 'active', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['id', 'name', 'priceCentavos', 'category', 'description', 'active', 'createdAt', 'updatedAt']) &&
+        data.id is string && data.id.size() >= 1 && data.id.size() <= 128 && data.id.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.id == productId &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 100 &&
+        data.priceCentavos is int && data.priceCentavos > 0 && data.priceCentavos <= 10000000 &&
+        data.category is string && data.category.size() <= 30 && data.category in ['Drinks', 'Food', 'Snacks', 'Merch'] &&
+        data.description is string && data.description.size() >= 1 && data.description.size() <= 300 &&
+        data.active is bool &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    // Validation Blueprint: First Line Item in Transaction
+    function isValidFirstOrderItem(item) {
+      return item is map &&
+        item.keys().hasAll(['productId', 'productName', 'unitPriceCentavos', 'quantity', 'subtotalCentavos']) &&
+        item.keys().hasOnly(['productId', 'productName', 'unitPriceCentavos', 'quantity', 'subtotalCentavos']) &&
+        item.productId is string && item.productId.size() >= 1 && item.productId.size() <= 128 &&
+        item.productName is string && item.productName.size() >= 1 && item.productName.size() <= 100 &&
+        item.unitPriceCentavos is int && item.unitPriceCentavos > 0 && item.unitPriceCentavos <= 10000000 &&
+        item.quantity is int && item.quantity >= 1 && item.quantity <= 999 &&
+        item.subtotalCentavos is int && item.subtotalCentavos == item.unitPriceCentavos * item.quantity;
+    }
+
+    // Validation Blueprint: Completed Kiosk Transaction
+    function isValidTransaction(data, transactionId) {
+      return data.keys().hasAll([
+          'transactionId',
+          'createdAt',
+          'createdAtIso',
+          'itemCount',
+          'items',
+          'totalAmountCentavos',
+          'paymentMethod',
+          'amountPaidCentavos',
+          'changeCentavos',
+          'status'
+        ]) &&
+        data.keys().hasOnly([
+          'transactionId',
+          'createdAt',
+          'createdAtIso',
+          'itemCount',
+          'items',
+          'totalAmountCentavos',
+          'paymentMethod',
+          'amountPaidCentavos',
+          'changeCentavos',
+          'status'
+        ]) &&
+        data.transactionId is string && data.transactionId.size() >= 10 && data.transactionId.size() <= 64 &&
+        data.transactionId.matches('^TXN-[0-9]{4}-[0-9A-Z\\-]+$') &&
+        data.transactionId == transactionId &&
+        data.createdAt is timestamp &&
+        data.createdAt == request.time &&
+        data.createdAtIso is string && data.createdAtIso.size() >= 10 && data.createdAtIso.size() <= 40 &&
+        data.itemCount is int && data.itemCount >= 1 && data.itemCount <= 5000 &&
+        data.items is list && data.items.size() >= 1 && data.items.size() <= 50 &&
+        isValidFirstOrderItem(data.items[0]) &&
+        data.totalAmountCentavos is int && data.totalAmountCentavos > 0 && data.totalAmountCentavos <= 50000000 &&
+        data.paymentMethod is string && data.paymentMethod.size() <= 30 &&
+        data.paymentMethod in ['Cash', 'QR Payment', 'Credit/Debit Card'] &&
+        data.amountPaidCentavos is int && data.amountPaidCentavos > 0 && data.amountPaidCentavos <= 100000000 &&
+        data.changeCentavos is int && data.changeCentavos >= 0 && data.changeCentavos <= 100000000 &&
+        data.status is string && data.status.size() <= 30 && data.status == 'Payment Successful' &&
+        (
+          (
+            data.paymentMethod == 'Cash' &&
+            data.amountPaidCentavos >= data.totalAmountCentavos &&
+            data.changeCentavos == data.amountPaidCentavos - data.totalAmountCentavos
+          ) ||
+          (
+            (data.paymentMethod == 'QR Payment' || data.paymentMethod == 'Credit/Debit Card') &&
+            data.amountPaidCentavos == data.totalAmountCentavos &&
+            data.changeCentavos == 0
+          )
+        );
+    }
+
+    // Validation Blueprint: Admin User
+    function isValidAdminUser(data, adminId) {
+      return data.keys().hasAll(['uid', 'role', 'createdAt']) &&
+        data.keys().hasOnly(['uid', 'role', 'createdAt']) &&
+        data.uid is string && data.uid.size() >= 1 && data.uid.size() <= 128 && data.uid.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.uid == adminId &&
+        data.role is string && data.role.size() <= 20 && data.role in ['admin', 'cashier'] &&
+        data.createdAt is timestamp;
+    }
+
+    // Collection: /products/{productId}
+    match /products/{productId} {
+      // Kiosk customers can read/list active products; Admins can read/list all products
+      allow get: if isValidId(productId) && (resource == null || existing().active == true || isAdmin());
+      allow list: if existing().active == true || isAdmin();
+
+      // Initial seed of the 8 default campus store items is allowed if the document does not exist yet;
+      // otherwise only verified Admins can create new products.
+      allow create: if isValidId(productId) &&
+        isValidProduct(incoming(), productId) &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        (
+          (isDefaultSeedProductId(productId) && !exists(/databases/$(database)/documents/products/$(productId))) ||
+          isAdmin()
+        );
+
+      // Action-Based Update Pattern: Only Admins can update products
+      allow update: if isValidId(productId) &&
+        isValidProduct(incoming(), productId) &&
+        isAdmin() &&
+        incoming().id == existing().id &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time && (
+          // Action 1: Toggle product active status
+          incoming().diff(existing()).affectedKeys().hasOnly(['active', 'updatedAt']) ||
+          // Action 2: Edit product details
+          incoming().diff(existing()).affectedKeys().hasOnly(['name', 'priceCentavos', 'category', 'description', 'active', 'updatedAt'])
+        );
+
+      allow delete: if isValidId(productId) && isAdmin();
+    }
+
+    // Collection: /transactions/{transactionId}
+    match /transactions/{transactionId} {
+      // Single transaction receipt lookup by valid transactionId is permitted for the kiosk receipt view;
+      // Listing transaction history is restricted strictly to verified Admins.
+      allow get: if isValidTransactionId(transactionId);
+      allow list: if isAdmin() && existing().status == 'Payment Successful';
+
+      // Controlled transaction creation from the self-service kiosk:
+      // Must pass strict schema, math, payment method, and server timestamp validation, and must not overwrite an existing transaction.
+      allow create: if isValidTransactionId(transactionId) &&
+        isValidTransaction(incoming(), transactionId) &&
+        !exists(/databases/$(database)/documents/transactions/$(transactionId));
+
+      // Terminal State Locking: Completed transactions are strictly immutable
+      allow update, delete: if false;
+    }
+
+    // Collection: /admins/{adminId}
+    match /admins/{adminId} {
+      allow get: if isValidId(adminId) && ((isSignedIn() && request.auth.uid == adminId) || isAdmin());
+      allow list: if isAdmin() && existing().role in ['admin', 'cashier'];
+      allow create: if isValidId(adminId) &&
+        isValidAdminUser(incoming(), adminId) &&
+        isAdmin() &&
+        incoming().createdAt == request.time;
+      allow update, delete: if false;
+    }
+  }
+}

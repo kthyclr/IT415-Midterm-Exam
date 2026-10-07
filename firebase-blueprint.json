@@ -1,0 +1,152 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "A food, drink, snack, or merchandise item sold at the Campus Store POS Kiosk.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Unique identifier for the product."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "description": "Display name of the product."
+        },
+        "priceCentavos": {
+          "type": "integer",
+          "description": "Unit price in integer centavos (e.g., 4500 for ₱45.00)."
+        },
+        "category": {
+          "type": "string",
+          "enum": ["Drinks", "Food", "Snacks", "Merch"],
+          "description": "Category of the product."
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 300,
+          "description": "Short description of the product."
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Whether the product is active and available for ordering."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation server timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last updated server timestamp."
+        }
+      },
+      "required": ["id", "name", "priceCentavos", "category", "description", "active", "createdAt", "updatedAt"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "A completed point-of-sale kiosk transaction record.",
+      "type": "object",
+      "properties": {
+        "transactionId": {
+          "type": "string",
+          "maxLength": 64,
+          "pattern": "^TXN-[0-9]{4}-[0-9A-Z\\-]+$",
+          "description": "Unique human-readable transaction reference number."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Completion server timestamp."
+        },
+        "createdAtIso": {
+          "type": "string",
+          "maxLength": 40,
+          "description": "ISO timestamp string for receipt formatting."
+        },
+        "itemCount": {
+          "type": "integer",
+          "description": "Total quantity of items in the transaction."
+        },
+        "items": {
+          "type": "array",
+          "description": "Snapshot array of purchased items (up to 50 distinct line items)."
+        },
+        "totalAmountCentavos": {
+          "type": "integer",
+          "description": "Total order amount in integer centavos."
+        },
+        "paymentMethod": {
+          "type": "string",
+          "enum": ["Cash", "QR Payment", "Credit/Debit Card"],
+          "description": "Selected payment method."
+        },
+        "amountPaidCentavos": {
+          "type": "integer",
+          "description": "Amount paid in integer centavos."
+        },
+        "changeCentavos": {
+          "type": "integer",
+          "description": "Change returned in integer centavos."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Payment Successful"],
+          "description": "Final transaction status."
+        }
+      },
+      "required": [
+        "transactionId",
+        "createdAt",
+        "createdAtIso",
+        "itemCount",
+        "items",
+        "totalAmountCentavos",
+        "paymentMethod",
+        "amountPaidCentavos",
+        "changeCentavos",
+        "status"
+      ]
+    },
+    "AdminUser": {
+      "title": "AdminUser",
+      "description": "A trusted admin or cashier user record.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin", "cashier"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "role", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Stores active and inactive products available on the POS kiosk."
+    },
+    "/transactions/{transactionId}": {
+      "schema": { "$ref": "#/entities/Transaction" },
+      "description": "Stores completed customer kiosk transactions."
+    },
+    "/admins/{adminId}": {
+      "schema": { "$ref": "#/entities/AdminUser" },
+      "description": "Trusted collection of admin/cashier UIDs."
+    }
+  }
+}
