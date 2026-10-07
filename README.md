@@ -157,10 +157,10 @@ The application connects to Firebase via `firebase-applet-config.json` (initiali
 
 ## 6. Member Contribution Register (Section C & E)
 
-| Member ID | Full Name | GitHub Account  | Implemented Tasks & Files |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **M1** | **Laureto, Kathy Claire S.** | `@kthyclr` | • Touchscreen Kiosk UI, Warm Creative theme (`src/index.css`)<br>• Brand Logo (`BrandLogo.tsx`) & Product Cards (`ProductCard.tsx`) with bundled product photos (`initialProducts.ts`)<br>• Cart state, quantity controls (`QuantityControl.tsx`, `CartOrderRow.tsx`), and integer centavo math (`currency.ts`) | 
-| **M2** | **Tumando, Marvin Ken P.** | `@marvinkentumando` | • Order Summary screen (`OrderSummaryScreen.tsx`) & Back navigation state preservation<br>• Payment Method selection (`PaymentMethodScreen.tsx`, `PaymentMethodCard.tsx`)<br>• Cash validation (`validation.ts`), on-screen numeric keypad, and QR/Card simulations (`PaymentProcessingScreen.tsx`) | 
-| **M3** | **Giverola, Aires Jhoy J.** | @giverolaires| • Project setup & Firebase SDK initialization (`src/firebase/config.ts`)<br>• Firestore persistence (`posService.ts`), security rules (`firestore.rules`), and security test suite (`firestore.rules.test.ts`)<br>• Unique transaction ID generator (`transactionId.ts`), `PaymentSuccessfulScreen.tsx`, and `ReceiptScreen.tsx` |
+| Member ID | Full Name | GitHub Account | Implemented Tasks & Files |
+| :--- | :--- | :--- | :--- |
+| **M1** | **Laureto, Kathy Claire S.** | `@kthyclr` | • Touchscreen Kiosk UI and Warm Creative theme (`src/index.css`)<br>• Brand Logo (`BrandLogo.tsx`) and Product Cards (`ProductCard.tsx`)<br>• Product catalog and bundled product photos (`initialProducts.ts`)<br>• Cart state and quantity controls (`QuantityControl.tsx`, `CartOrderRow.tsx`)<br>• Integer-centavo currency calculations (`currency.ts`) |
+| **M2** | **Tumando, Marvin Ken P.** | `@marvinkentumando` | • Order Summary screen and Back/Modify Order navigation (`OrderSummaryScreen.tsx`)<br>• Payment Method selection (`PaymentMethodScreen.tsx`, `PaymentMethodCard.tsx`)<br>• Cash payment validation and change computation (`validation.ts`)<br>• On-screen numeric keypad for cash payments<br>• QR Payment and Credit/Debit Card simulations (`PaymentProcessingScreen.tsx`) |
+| **M3** | **Giverola, Aires Jhoy J.** | `@giverolaires` | • Project setup and Firebase SDK initialization (`src/firebase/config.ts`)<br>• Cloud Firestore persistence and CRUD operations (`posService.ts`)<br>• Firestore security rules and automated security tests (`firestore.rules`, `firestore.rules.test.ts`)<br>• Unique transaction reference generator (`transactionId.ts`)<br>• Payment Successful and Digital Receipt screens (`PaymentSuccessfulScreen.tsx`, `ReceiptScreen.tsx`) |
 
-> **AI Development Evidence**: See [`AI_DEVELOPMENT_LOG.md`](./AI_DEVELOPMENT_LOG.md) for the complete record of generation prompts, AI-assisted debugging, AI-assisted refactoring, critical evaluations, and manual adaptations mapped to M1, M2, and M3.
+> **AI Development Evidence:** See [`AI_DEVELOPMENT_LOG.md`](./AI_DEVELOPMENT_LOG.md) for the complete record of generation prompts, AI-assisted debugging, AI-assisted refactoring, critical evaluations, and manual adaptations mapped to M1, M2, and M3.
