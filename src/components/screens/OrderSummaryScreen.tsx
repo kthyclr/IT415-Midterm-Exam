@@ -2,12 +2,18 @@ import React from 'react';
 import { DiningOption, OrderItem } from '../../types/pos';
 import { formatCurrency } from '../../utils/currency';
 import { ProgressIndicator } from '../ui/ProgressIndicator';
+import { DiscountToggle } from '../ui/DiscountToggle';
+import { ArrowLeft, ArrowRight, ClipboardCheck } from 'lucide-react';
 import { ArrowLeft, ArrowRight, ClipboardCheck, Utensils, ShoppingBag, Check } from 'lucide-react';
 
 interface OrderSummaryScreenProps {
   cartItems: OrderItem[];
+  subtotalAmountCentavos: number;
+  discountAmountCentavos: number;
   totalAmountCentavos: number;
   totalItemCount: number;
+  isSeniorPwd: boolean;
+  onToggleDiscount: (enabled: boolean) => void;
   diningOption: DiningOption;
   onChangeDiningOption: (option: DiningOption) => void;
   onBackToSelection: () => void;
@@ -16,8 +22,12 @@ interface OrderSummaryScreenProps {
 
 export const OrderSummaryScreen: React.FC<OrderSummaryScreenProps> = ({
   cartItems,
+  subtotalAmountCentavos,
+  discountAmountCentavos,
   totalAmountCentavos,
   totalItemCount,
+  isSeniorPwd,
+  onToggleDiscount,
   diningOption,
   onChangeDiningOption,
   onBackToSelection,
@@ -89,6 +99,19 @@ export const OrderSummaryScreen: React.FC<OrderSummaryScreenProps> = ({
           </table>
         </div>
 
+        {/* Senior Citizen / PWD Discount Toggle */}
+        <DiscountToggle
+          isSeniorPwd={isSeniorPwd}
+          onToggle={onToggleDiscount}
+          discountAmountCentavos={discountAmountCentavos}
+          formattedDiscount={formatCurrency(discountAmountCentavos)}
+        />
+
+        {/* Total Summary Box with Breakdown */}
+        <div className="bg-[#fffcf2] rounded-2xl p-5 border-2 border-[#252422] flex flex-col gap-3 mt-4">
+          <div className="flex justify-between items-center text-sm font-mono text-[#403d39]">
+            <span>Subtotal</span>
+            <span>{formatCurrency(subtotalAmountCentavos)}</span>
         {/* Dine-In vs. Take-Out Selection */}
         <div className="my-6 p-5 bg-[#fffcf2] rounded-2xl border-2 border-[#252422]">
           <span className="kiosk-label block mb-1">Dining Option</span>
@@ -185,8 +208,24 @@ export const OrderSummaryScreen: React.FC<OrderSummaryScreenProps> = ({
               All prices are inclusive of applicable campus outlet taxes.
             </span>
           </div>
-          <div className="text-3xl sm:text-4xl font-mono font-bold text-[#eb5e28] tabular-nums">
-            {formatCurrency(totalAmountCentavos)}
+
+          {isSeniorPwd && (
+            <div className="flex justify-between items-center text-sm font-mono font-bold text-[#eb5e28]">
+              <span>Senior / PWD Discount (20%)</span>
+              <span>-{formatCurrency(discountAmountCentavos)}</span>
+            </div>
+          )}
+
+          <div className="pt-3 border-t-2 border-[#252422] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <span className="kiosk-label block">Total Amount Due</span>
+              <span className="text-xs text-[#403d39]">
+                All prices are inclusive of applicable campus outlet taxes.
+              </span>
+            </div>
+            <div className="text-3xl sm:text-4xl font-mono font-bold text-[#eb5e28] tabular-nums">
+              {formatCurrency(totalAmountCentavos)}
+            </div>
           </div>
         </div>
 

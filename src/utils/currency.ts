@@ -47,3 +47,19 @@ export function calculateOrderTotal(items: { subtotalCentavos: number }[]): numb
 export function calculateTotalQuantity(items: { quantity: number }[]): number {
   return items.reduce((sum, item) => sum + Math.round(item.quantity), 0);
 }
+
+/**
+ * Calculates 20% Senior Citizen / PWD discount in integer centavos.
+ */
+export function calculateDiscountCentavos(subtotalCentavos: number, isSeniorPwd: boolean): number {
+  if (!isSeniorPwd || subtotalCentavos <= 0) return 0;
+  return Math.round(subtotalCentavos * 0.20);
+}
+
+/**
+ * Calculates final payable total after applying discount.
+ */
+export function calculateFinalTotalCentavos(subtotalCentavos: number, discountCentavos: number): number {
+  const total = subtotalCentavos - discountCentavos;
+  return total > 0 ? total : 0;
+}
