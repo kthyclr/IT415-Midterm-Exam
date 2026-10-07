@@ -8,6 +8,7 @@ export interface Product {
   priceCentavos: number;
   category: ProductCategory;
   description: string;
+  imageUrl?: string;
   active: boolean;
   createdAt?: unknown;
   updatedAt?: unknown;

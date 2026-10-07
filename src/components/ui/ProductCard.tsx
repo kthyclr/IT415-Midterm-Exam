@@ -1,17 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Product } from '../../types/pos';
 import { formatCurrency } from '../../utils/currency';
-import {
-  Coffee,
-  Sandwich,
-  CupSoda,
-  Cookie,
-  GlassWater,
-  Candy,
-  ShoppingBag,
-  Tag,
-  Plus,
-} from 'lucide-react';
+import { resolveProductImage } from '../../data/initialProducts';
+import { Plus, Utensils } from 'lucide-react';
 
 interface ProductCardProps {
   product: Product;
@@ -19,93 +10,77 @@ interface ProductCardProps {
   onSelectProduct: (product: Product) => void;
 }
 
-function getProductIcon(product: Product) {
-  const lower = product.name.toLowerCase();
-  if (lower.includes('coffee')) return <Coffee className="w-7 h-7 text-amber-800" />;
-  if (lower.includes('sandwich')) return <Sandwich className="w-7 h-7 text-orange-700" />;
-  if (lower.includes('soft drink') || lower.includes('soda') || lower.includes('cola'))
-    return <CupSoda className="w-7 h-7 text-rose-700" />;
-  if (lower.includes('cookie')) return <Cookie className="w-7 h-7 text-amber-700" />;
-  if (lower.includes('water') || lower.includes('tumbler'))
-    return <GlassWater className="w-7 h-7 text-sky-700" />;
-  if (lower.includes('chocolate') || lower.includes('candy'))
-    return <Candy className="w-7 h-7 text-purple-700" />;
-  if (product.category === 'Merch') return <ShoppingBag className="w-7 h-7 text-emerald-700" />;
-  return <Tag className="w-7 h-7 text-slate-700" />;
-}
-
-function getProductSurfaceTint(product: Product): string {
-  const lower = product.name.toLowerCase();
-  if (lower.includes('coffee')) return 'bg-amber-50/80 border-amber-200/60';
-  if (lower.includes('sandwich')) return 'bg-orange-50/80 border-orange-200/60';
-  if (lower.includes('soft drink')) return 'bg-rose-50/80 border-rose-200/60';
-  if (lower.includes('cookie')) return 'bg-yellow-50/80 border-yellow-200/60';
-  if (lower.includes('water')) return 'bg-sky-50/80 border-sky-200/60';
-  if (lower.includes('chocolate')) return 'bg-purple-50/80 border-purple-200/60';
-  return 'bg-emerald-50/70 border-emerald-200/60';
-}
-
 export const ProductCard: React.FC<ProductCardProps> = ({
   product,
   quantityInCart,
   onSelectProduct,
 }) => {
+  const [imgError, setImgError] = useState(false);
   const isSelected = quantityInCart > 0;
+  const imgSrc = resolveProductImage(product);
 
   return (
     <button
       type="button"
       onClick={() => onSelectProduct(product)}
-      className={`group text-left w-full rounded-2xl p-5 transition-all duration-150 active:scale-[0.98] flex flex-col justify-between min-h-[190px] cursor-pointer border ${
-        isSelected
-          ? 'bg-white border-emerald-600 ring-2 ring-emerald-600/20 shadow-sm'
-          : 'bg-white border-slate-200 hover:border-slate-300 shadow-2xs'
+      className={`ink-card-interactive text-left w-full p-4 sm:p-5 flex flex-col justify-between cursor-pointer relative overflow-hidden ${
+        isSelected ? 'ring-3 ring-[#eb5e28]' : ''
       }`}
     >
       <div>
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <div
-            className={`w-14 h-14 rounded-2xl flex items-center justify-center border ${getProductSurfaceTint(
-              product
-            )}`}
-          >
-            {getProductIcon(product)}
-          </div>
-
-          <div className="text-right">
-            <span className="text-xs font-medium text-slate-500 block">
-              {product.category}
-            </span>
-            {isSelected && (
-              <span className="text-xs font-mono font-bold text-emerald-700 mt-1 block">
-                {quantityInCart} in order
+        {/* Product Image Container */}
+        <div className="relative w-full aspect-4/3 rounded-2xl border-2 border-[#252422] overflow-hidden bg-[#fffcf2] mb-3.5">
+          {!imgError && imgSrc ? (
+            <img
+              src={imgSrc}
+              alt={product.name}
+              referrerPolicy="no-referrer"
+              onError={() => setImgError(true)}
+              className="w-full h-full object-cover transition-transform duration-200 hover:scale-105"
+            />
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-[#fff0eb] text-[#eb5e28] p-4 text-center">
+              <Utensils className="w-8 h-8 mb-1" />
+              <span className="font-mono text-xs font-bold uppercase text-[#252422]">
+                {product.name}
               </span>
-            )}
-          </div>
+            </div>
+          )}
+
+          {isSelected && (
+            <span className="absolute top-2.5 right-2.5 font-mono text-xs font-bold bg-[#252422] text-white px-2.5 py-1 rounded-xl border-2 border-white shadow-xs">
+              ×{quantityInCart} IN TRAY
+            </span>
+          )}
         </div>
 
-        <h3 className="text-lg font-bold text-slate-900 leading-snug">
+        <div className="flex items-center justify-between gap-2">
+          <span className="kiosk-label">{product.category}</span>
+        </div>
+
+        <h3 className="handwritten text-3xl font-bold text-[#252422] mt-1 mb-1 leading-none">
           {product.name}
         </h3>
-        <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+
+        <p className="text-xs sm:text-sm text-[#403d39] leading-snug mb-4 line-clamp-2">
           {product.description}
         </p>
       </div>
 
-      <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between gap-2">
-        <span className="text-xl font-mono font-bold text-slate-900 tabular-nums">
+      <div className="flex items-center justify-between gap-2 pt-2 border-t-2 border-dashed border-[#252422]/15">
+        <div className="font-mono font-bold text-base sm:text-lg text-[#252422] bg-[#fff0eb] border-2 border-[#252422] px-3 py-1 rounded-xl tabular-nums">
           {formatCurrency(product.priceCentavos)}
-        </span>
+        </div>
 
         <span
-          className={`min-h-[44px] px-4 rounded-xl text-sm font-semibold inline-flex items-center gap-1.5 transition-colors whitespace-nowrap ${
+          className={`min-h-[44px] px-3.5 py-2 rounded-xl border-2 border-[#252422] font-mono text-xs font-bold uppercase inline-flex items-center gap-1 transition-colors ${
             isSelected
-              ? 'bg-emerald-700 text-white'
-              : 'bg-slate-100 text-slate-800 group-hover:bg-emerald-700 group-hover:text-white'
+              ? 'bg-[#eb5e28] text-white'
+              : 'bg-[#fffcf2] text-[#252422] hover:bg-[#eb5e28] hover:text-white'
           }`}
         >
           <Plus className="w-4 h-4 stroke-[2.5]" />
-          Tap to Add
+          Add
         </span>
       </div>
     </button>

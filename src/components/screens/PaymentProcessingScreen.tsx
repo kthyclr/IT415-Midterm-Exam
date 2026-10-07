@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { PaymentMethod } from '../../types/pos';
 import { centavosToPesos, formatCurrency } from '../../utils/currency';
 import { validateCashPayment } from '../../utils/validation';
+import { ProgressIndicator } from '../ui/ProgressIndicator';
 import {
   ArrowLeft,
   Banknote,
@@ -22,10 +23,6 @@ interface PaymentProcessingScreenProps {
   onCompletePayment: (amountPaidCentavos: number, changeCentavos: number) => Promise<void>;
 }
 
-/**
- * Deterministic 15x15 QR Code Matrix Generator for Simulated QR Payment
- * Generates a realistic scannable-style SVG matrix encoding the order total and reference seed.
- */
 function buildSimulatedQrMatrix(seedText: string): boolean[][] {
   const size = 17;
   const grid: boolean[][] = Array.from({ length: size }, () => Array(size).fill(false));
@@ -113,7 +110,6 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
       onChangeCashInput(cashInput.length === 0 ? '0.' : `${cashInput}.`);
       return;
     }
-    // Prevent more than 2 decimal places
     const parts = cashInput.split('.');
     if (parts.length === 2 && parts[1].length >= 2) return;
     if (cashInput.replace('.', '').length >= 7) return;
@@ -151,7 +147,6 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
     setValidationError(null);
     setIsProcessing(true);
     try {
-      // Brief realistic verification state
       await new Promise((resolve) => setTimeout(resolve, 650));
       await onCompletePayment(totalAmountCentavos, 0);
     } catch (err) {
@@ -166,7 +161,6 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
     setValidationError(null);
     setIsProcessing(true);
     try {
-      // Brief simulated card processing delay as required by the exam
       await new Promise((resolve) => setTimeout(resolve, 1100));
       await onCompletePayment(totalAmountCentavos, 0);
     } catch (err) {
@@ -181,20 +175,24 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs">
+      <div className="mb-6">
+        <ProgressIndicator currentStage="PAYMENT_PROCESSING" variant="inline" />
+      </div>
+
+      <div className="ink-card p-6 sm:p-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b-2 border-dashed border-[#252422]">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200/70 flex items-center justify-center text-emerald-700">
-              {paymentMethod === 'Cash' && <Banknote className="w-6 h-6" />}
-              {paymentMethod === 'QR Payment' && <QrCode className="w-6 h-6" />}
-              {paymentMethod === 'Credit/Debit Card' && <CreditCard className="w-6 h-6" />}
+            <div className="w-14 h-14 rounded-2xl bg-[#fffcf2] border-2 border-[#252422] flex items-center justify-center text-[#eb5e28] shadow-[3px_3px_0_#252422]">
+              {paymentMethod === 'Cash' && <Banknote className="w-7 h-7" />}
+              {paymentMethod === 'QR Payment' && <QrCode className="w-7 h-7" />}
+              {paymentMethod === 'Credit/Debit Card' && <CreditCard className="w-7 h-7" />}
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">
+              <h1 className="handwritten text-4xl sm:text-5xl font-bold text-[#252422] leading-none">
                 {paymentMethod}
               </h1>
-              <p className="text-sm text-slate-500 mt-0.5">
+              <p className="text-sm text-[#403d39] mt-1">
                 {paymentMethod === 'Cash'
                   ? 'Enter or tap the cash amount tendered by the customer.'
                   : paymentMethod === 'QR Payment'
@@ -204,11 +202,9 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
             </div>
           </div>
 
-          <div className="bg-slate-50 px-5 py-3 rounded-xl border border-slate-200 text-left sm:text-right">
-            <span className="text-xs font-medium text-slate-500 block">
-              Total Amount Due
-            </span>
-            <span className="text-2xl font-mono font-bold text-emerald-800 tabular-nums">
+          <div className="bg-[#fffcf2] px-5 py-3 rounded-2xl border-2 border-[#252422] text-left sm:text-right">
+            <span className="kiosk-label block">Total Amount Due</span>
+            <span className="text-2xl font-mono font-bold text-[#eb5e28] tabular-nums">
               {formatCurrency(totalAmountCentavos)}
             </span>
           </div>
@@ -221,12 +217,12 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
               <div>
                 <label
                   htmlFor="cash-amount-input"
-                  className="block text-sm font-bold text-slate-800 mb-2"
+                  className="block kiosk-label mb-2"
                 >
                   Amount Paid (₱)
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-mono font-bold text-slate-400">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-mono font-bold text-[#403d39]">
                     ₱
                   </span>
                   <input
@@ -240,32 +236,32 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
                     }}
                     placeholder="0.00"
                     disabled={isProcessing}
-                    className="w-full min-h-[60px] pl-10 pr-4 py-3 text-2xl font-mono font-bold text-slate-900 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-emerald-700 focus:bg-white transition-colors tabular-nums"
+                    className="w-full min-h-[60px] pl-10 pr-4 py-3 text-2xl font-mono font-bold text-[#252422] bg-[#fffcf2] border-[3px] border-[#252422] rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#eb5e28] tabular-nums"
                   />
                 </div>
               </div>
 
               {/* Quick Denomination Touch Buttons */}
               <div>
-                <span className="text-xs font-semibold text-slate-500 block mb-2">
+                <span className="kiosk-label block mb-2">
                   Quick Cash Amounts
                 </span>
-                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
                   <button
                     type="button"
                     disabled={isProcessing}
                     onClick={() => handleQuickDenomination(exactPesos)}
-                    className="min-h-[48px] px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 font-mono text-xs font-bold hover:bg-emerald-100 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+                    className="col-span-3 sm:col-span-2 min-h-[48px] px-3 py-2 rounded-xl bg-[#fff0eb] border-2 border-[#252422] text-[#252422] font-mono text-xs font-bold hover:bg-[#eb5e28] hover:text-white active:translate-y-0.5 transition-all cursor-pointer whitespace-nowrap"
                   >
                     Exact ({formatCurrency(totalAmountCentavos)})
                   </button>
-                  {[50, 100, 200, 500, 1000].map((bill) => (
+                  {[50, 100, 200, 500].map((bill) => (
                     <button
                       key={bill}
                       type="button"
                       disabled={isProcessing}
                       onClick={() => handleQuickDenomination(bill)}
-                      className="min-h-[48px] px-3 py-2 rounded-xl bg-slate-100 border border-slate-200 text-slate-800 font-mono text-sm font-bold hover:bg-slate-200 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+                      className="min-h-[48px] px-3 py-2 rounded-xl bg-white border-2 border-[#252422] text-[#252422] font-mono text-sm font-bold hover:bg-[#fffcf2] active:translate-y-0.5 transition-all cursor-pointer whitespace-nowrap"
                     >
                       ₱{bill}
                     </button>
@@ -277,36 +273,38 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
               {validationError && (
                 <div
                   role="alert"
-                  className="p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3 text-red-900"
+                  className="p-4 rounded-2xl bg-[#fff0eb] border-2 border-[#252422] flex items-start gap-3 text-[#252422]"
                 >
-                  <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
-                  <div className="text-sm font-semibold">{validationError}</div>
+                  <AlertCircle className="w-5 h-5 text-[#eb5e28] shrink-0 mt-0.5" />
+                  <div className="text-sm font-mono font-bold">{validationError}</div>
                 </div>
               )}
 
               {/* Live Change Calculation Box */}
-              <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200 flex flex-col gap-3 mt-auto">
+              <div className="bg-[#fffcf2] rounded-2xl p-5 border-2 border-[#252422] flex flex-col gap-3 mt-auto">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-600 font-medium">Total Amount Due</span>
-                  <span className="font-mono font-bold text-slate-900 tabular-nums">
+                  <span className="kiosk-label">Total Amount Due</span>
+                  <span className="font-mono font-bold text-[#252422] tabular-nums">
                     {formatCurrency(totalAmountCentavos)}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-600 font-medium">Cash Tendered</span>
-                  <span className="font-mono font-bold text-slate-900 tabular-nums">
+                  <span className="kiosk-label">Cash Tendered</span>
+                  <span className="font-mono font-bold text-[#252422] tabular-nums">
                     {cashInput.trim() && !Number.isNaN(Number(cashInput)) && Number(cashInput) >= 0
                       ? formatCurrency(Math.round(Number(cashInput) * 100))
                       : '₱0.00'}
                   </span>
                 </div>
 
-                <div className="pt-3 border-t border-slate-200 flex items-center justify-between">
-                  <span className="text-base font-bold text-slate-900">Change Due</span>
+                <div className="pt-3 border-t-2 border-dashed border-[#252422]/30 flex items-center justify-between">
+                  <span className="handwritten text-2xl font-bold text-[#252422]">
+                    Change Due
+                  </span>
                   <span
                     className={`text-2xl font-mono font-bold tabular-nums ${
-                      liveCashPreview.valid ? 'text-emerald-700' : 'text-slate-400'
+                      liveCashPreview.valid ? 'text-[#eb5e28]' : 'text-[#403d39]/40'
                     }`}
                   >
                     {formatCurrency(liveCashPreview.changeCentavos)}
@@ -316,8 +314,8 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
             </div>
 
             {/* Touchscreen Numeric Keypad */}
-            <div className="lg:col-span-5 bg-slate-50 p-4 rounded-2xl border border-slate-200 flex flex-col justify-between">
-              <span className="text-xs font-semibold text-slate-500 mb-2 block text-center">
+            <div className="lg:col-span-5 bg-[#fffcf2] p-4 rounded-2xl border-2 border-[#252422] flex flex-col justify-between">
+              <span className="kiosk-label mb-2 block text-center">
                 Touchscreen Keypad
               </span>
               <div className="grid grid-cols-3 gap-2.5">
@@ -327,7 +325,7 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
                     type="button"
                     disabled={isProcessing}
                     onClick={() => handleKeypadPress(digit)}
-                    className="min-h-[56px] rounded-xl bg-white border border-slate-200 text-xl font-mono font-bold text-slate-900 hover:bg-slate-100 active:scale-95 transition-all shadow-2xs cursor-pointer"
+                    className="min-h-[56px] rounded-xl bg-white border-2 border-[#252422] text-xl font-mono font-bold text-[#252422] hover:bg-[#fff0eb] active:translate-y-0.5 transition-all shadow-[2px_2px_0_#252422] cursor-pointer"
                   >
                     {digit}
                   </button>
@@ -337,7 +335,7 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
                   disabled={isProcessing}
                   onClick={() => handleKeypadPress('BACKSPACE')}
                   aria-label="Backspace"
-                  className="min-h-[56px] rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 active:scale-95 transition-all flex items-center justify-center shadow-2xs cursor-pointer"
+                  className="min-h-[56px] rounded-xl bg-white border-2 border-[#252422] text-[#252422] hover:bg-[#fff0eb] active:translate-y-0.5 transition-all flex items-center justify-center shadow-[2px_2px_0_#252422] cursor-pointer"
                 >
                   <Delete className="w-5 h-5" />
                 </button>
@@ -347,19 +345,19 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
                 type="button"
                 disabled={isProcessing}
                 onClick={() => handleKeypadPress('CLEAR')}
-                className="mt-2.5 w-full min-h-[48px] rounded-xl bg-slate-200/80 text-slate-800 text-sm font-bold hover:bg-slate-300/80 active:scale-98 transition-all cursor-pointer"
+                className="mt-2.5 w-full min-h-[48px] rounded-xl bg-[#252422] text-white font-mono text-xs font-bold uppercase hover:bg-[#403d39] transition-all cursor-pointer"
               >
                 Clear Amount
               </button>
             </div>
 
             {/* Bottom Submit Controls */}
-            <div className="lg:col-span-12 pt-4 border-t border-slate-200 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-4">
+            <div className="lg:col-span-12 pt-4 border-t-2 border-dashed border-[#252422] flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-4">
               <button
                 type="button"
                 disabled={isProcessing}
                 onClick={onBackToMethods}
-                className="min-h-[56px] px-6 py-3.5 rounded-xl bg-slate-100 text-slate-800 hover:bg-slate-200 text-base font-bold inline-flex items-center justify-center gap-2 transition-all cursor-pointer whitespace-nowrap"
+                className="min-h-[58px] px-6 py-3.5 rounded-2xl ink-btn-secondary font-mono text-xs font-bold uppercase inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
               >
                 <ArrowLeft className="w-5 h-5" />
                 <span>Change Payment Method</span>
@@ -368,7 +366,7 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
               <button
                 type="submit"
                 disabled={isProcessing}
-                className="min-h-[56px] px-10 py-3.5 rounded-xl bg-emerald-700 text-white hover:bg-emerald-800 active:scale-[0.99] text-base font-bold inline-flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer whitespace-nowrap"
+                className="min-h-[58px] px-10 py-3.5 rounded-2xl ink-btn-accent handwritten text-3xl font-bold inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
               >
                 {isProcessing ? (
                   <>
@@ -377,7 +375,7 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
                   </>
                 ) : (
                   <>
-                    <CheckCircle2 className="w-5 h-5" />
+                    <CheckCircle2 className="w-6 h-6" />
                     <span>Pay Now ({formatCurrency(totalAmountCentavos)})</span>
                   </>
                 )}
@@ -389,14 +387,13 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
         {/* QR PAYMENT SIMULATION FLOW */}
         {paymentMethod === 'QR Payment' && (
           <div className="my-6 flex flex-col items-center text-center max-w-xl mx-auto">
-            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 w-full flex flex-col items-center">
-              <span className="text-xs font-mono font-semibold text-emerald-800 mb-3">
+            <div className="bg-[#fffcf2] p-6 rounded-2xl border-2 border-[#252422] w-full flex flex-col items-center">
+              <span className="kiosk-label mb-3">
                 SIMULATED CAMPUS QR PH TERMINAL
               </span>
 
-              {/* Dynamic SVG QR Code */}
               <div
-                className="bg-white p-4 rounded-2xl border-2 border-slate-900 shadow-xs inline-block"
+                className="bg-white p-4 rounded-2xl border-[3px] border-[#252422] shadow-[4px_4px_0_#252422] inline-block"
                 aria-label="Simulated Payment QR Code"
               >
                 <svg
@@ -416,7 +413,7 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
                           y={rIdx}
                           width={1}
                           height={1}
-                          fill="#0F172A"
+                          fill="#252422"
                         />
                       ) : null
                     )
@@ -425,34 +422,34 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
               </div>
 
               <div className="mt-4">
-                <span className="text-xs text-slate-500 block">Exact Amount to Pay</span>
-                <span className="text-2xl font-mono font-bold text-slate-900 tabular-nums">
+                <span className="kiosk-label block">Exact Amount to Pay</span>
+                <span className="text-3xl font-mono font-bold text-[#eb5e28] tabular-nums">
                   {formatCurrency(totalAmountCentavos)}
                 </span>
               </div>
 
-              <p className="text-sm text-slate-600 mt-3 max-w-md leading-relaxed">
+              <p className="text-sm text-[#403d39] mt-3 max-w-md leading-relaxed">
                 Scan this QR code using any supported e-wallet or mobile banking application, then tap{' '}
-                <strong className="text-slate-900">Confirm Payment</strong> below to complete your order.
+                <strong className="text-[#252422]">Confirm Payment</strong> below to complete your order.
               </p>
             </div>
 
             {validationError && (
               <div
                 role="alert"
-                className="mt-4 w-full p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-3 text-red-900 text-left"
+                className="mt-4 w-full p-4 rounded-2xl bg-[#fff0eb] border-2 border-[#252422] flex items-center gap-3 text-[#252422] text-left"
               >
-                <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
-                <span className="text-sm font-semibold">{validationError}</span>
+                <AlertCircle className="w-5 h-5 text-[#eb5e28] shrink-0" />
+                <span className="text-sm font-mono font-bold">{validationError}</span>
               </div>
             )}
 
-            <div className="w-full pt-6 mt-6 border-t border-slate-200 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-4">
+            <div className="w-full pt-6 mt-6 border-t-2 border-dashed border-[#252422] flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-4">
               <button
                 type="button"
                 disabled={isProcessing}
                 onClick={onBackToMethods}
-                className="min-h-[56px] px-6 py-3.5 rounded-xl bg-slate-100 text-slate-800 hover:bg-slate-200 text-base font-bold inline-flex items-center justify-center gap-2 transition-all cursor-pointer whitespace-nowrap"
+                className="min-h-[58px] px-6 py-3.5 rounded-2xl ink-btn-secondary font-mono text-xs font-bold uppercase inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
               >
                 <ArrowLeft className="w-5 h-5" />
                 <span>Back</span>
@@ -462,7 +459,7 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
                 type="button"
                 disabled={isProcessing}
                 onClick={handleSimulatedQrConfirm}
-                className="min-h-[56px] px-8 py-3.5 rounded-xl bg-emerald-700 text-white hover:bg-emerald-800 active:scale-[0.99] text-base font-bold inline-flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer whitespace-nowrap"
+                className="min-h-[58px] px-8 py-3.5 rounded-2xl ink-btn-accent handwritten text-3xl font-bold inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
               >
                 {isProcessing ? (
                   <>
@@ -471,7 +468,7 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
                   </>
                 ) : (
                   <>
-                    <CheckCircle2 className="w-5 h-5" />
+                    <CheckCircle2 className="w-6 h-6" />
                     <span>Confirm Payment</span>
                   </>
                 )}
@@ -483,30 +480,30 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
         {/* CREDIT / DEBIT CARD SIMULATION FLOW */}
         {paymentMethod === 'Credit/Debit Card' && (
           <div className="my-6 flex flex-col items-center text-center max-w-xl mx-auto">
-            <div className="bg-slate-50 p-8 rounded-2xl border border-slate-200 w-full flex flex-col items-center">
-              <div className="w-20 h-20 rounded-2xl bg-white border-2 border-slate-200 flex items-center justify-center text-emerald-700 shadow-2xs mb-4">
+            <div className="bg-[#fffcf2] p-8 rounded-2xl border-2 border-[#252422] w-full flex flex-col items-center">
+              <div className="w-20 h-20 rounded-2xl bg-white border-[3px] border-[#252422] flex items-center justify-center text-[#eb5e28] shadow-[4px_4px_0_#252422] mb-4">
                 {isProcessing ? (
-                  <div className="w-9 h-9 border-3 border-emerald-700 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-9 h-9 border-3 border-[#eb5e28] border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <Wifi className="w-10 h-10 rotate-90" />
                 )}
               </div>
 
-              <h2 className="text-xl font-bold text-slate-900">
+              <h2 className="handwritten text-4xl font-bold text-[#252422]">
                 {isProcessing
                   ? 'Processing payment...'
                   : 'Please tap, insert, or swipe your card.'}
               </h2>
 
-              <p className="text-sm text-slate-600 mt-2 max-w-md leading-relaxed">
+              <p className="text-sm text-[#403d39] mt-2 max-w-md leading-relaxed">
                 {isProcessing
                   ? 'Communicating with simulated campus card terminal. Please do not remove your card.'
                   : 'Present your contactless credit or debit card to the kiosk reader below. No card numbers or PINs are collected.'}
               </p>
 
-              <div className="mt-5 pt-4 border-t border-slate-200/80 w-full flex items-center justify-between text-sm max-w-xs">
-                <span className="text-slate-500 font-medium">Amount to Charge:</span>
-                <span className="text-xl font-mono font-bold text-slate-900 tabular-nums">
+              <div className="mt-5 pt-4 border-t-2 border-dashed border-[#252422]/30 w-full flex items-center justify-between text-sm max-w-xs">
+                <span className="kiosk-label">Amount to Charge:</span>
+                <span className="text-xl font-mono font-bold text-[#eb5e28] tabular-nums">
                   {formatCurrency(totalAmountCentavos)}
                 </span>
               </div>
@@ -515,19 +512,19 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
             {validationError && (
               <div
                 role="alert"
-                className="mt-4 w-full p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-3 text-red-900 text-left"
+                className="mt-4 w-full p-4 rounded-2xl bg-[#fff0eb] border-2 border-[#252422] flex items-center gap-3 text-[#252422] text-left"
               >
-                <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
-                <span className="text-sm font-semibold">{validationError}</span>
+                <AlertCircle className="w-5 h-5 text-[#eb5e28] shrink-0" />
+                <span className="text-sm font-mono font-bold">{validationError}</span>
               </div>
             )}
 
-            <div className="w-full pt-6 mt-6 border-t border-slate-200 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-4">
+            <div className="w-full pt-6 mt-6 border-t-2 border-dashed border-[#252422] flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-4">
               <button
                 type="button"
                 disabled={isProcessing}
                 onClick={onBackToMethods}
-                className="min-h-[56px] px-6 py-3.5 rounded-xl bg-slate-100 text-slate-800 hover:bg-slate-200 text-base font-bold inline-flex items-center justify-center gap-2 transition-all cursor-pointer whitespace-nowrap"
+                className="min-h-[58px] px-6 py-3.5 rounded-2xl ink-btn-secondary font-mono text-xs font-bold uppercase inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
               >
                 <ArrowLeft className="w-5 h-5" />
                 <span>Back</span>
@@ -537,7 +534,7 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
                 type="button"
                 disabled={isProcessing}
                 onClick={handleSimulatedCardProcess}
-                className="min-h-[56px] px-8 py-3.5 rounded-xl bg-emerald-700 text-white hover:bg-emerald-800 active:scale-[0.99] text-base font-bold inline-flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer whitespace-nowrap"
+                className="min-h-[58px] px-8 py-3.5 rounded-2xl ink-btn-accent handwritten text-3xl font-bold inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
               >
                 {isProcessing ? (
                   <>
@@ -546,7 +543,7 @@ export const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = (
                   </>
                 ) : (
                   <>
-                    <CreditCard className="w-5 h-5" />
+                    <CreditCard className="w-6 h-6" />
                     <span>Process Payment</span>
                   </>
                 )}

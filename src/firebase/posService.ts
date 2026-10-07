@@ -13,7 +13,7 @@ import {
 import { db } from './config';
 import { handleFirestoreError, OperationType } from './errorHandler';
 import { CompletedTransaction, Product } from '../types/pos';
-import { INITIAL_CAMPUS_PRODUCTS } from '../data/initialProducts';
+import { INITIAL_CAMPUS_PRODUCTS, resolveProductImage } from '../data/initialProducts';
 
 const PRODUCTS_COLLECTION = 'products';
 const TRANSACTIONS_COLLECTION = 'transactions';
@@ -84,18 +84,24 @@ export async function fetchAllProductsForAdmin(): Promise<Product[]> {
 }
 
 function parseProductDoc(docId: string, data: Record<string, unknown>): Product {
+  const id = typeof data.id === 'string' ? data.id : docId;
+  const name = typeof data.name === 'string' ? data.name : 'Unnamed Product';
+  const category =
+    data.category === 'Drinks' ||
+    data.category === 'Food' ||
+    data.category === 'Snacks' ||
+    data.category === 'Merch'
+      ? data.category
+      : 'Food';
+  const rawImageUrl = typeof data.imageUrl === 'string' ? data.imageUrl : undefined;
+
   return {
-    id: typeof data.id === 'string' ? data.id : docId,
-    name: typeof data.name === 'string' ? data.name : 'Unnamed Product',
+    id,
+    name,
     priceCentavos: typeof data.priceCentavos === 'number' ? Math.round(data.priceCentavos) : 0,
-    category:
-      data.category === 'Drinks' ||
-      data.category === 'Food' ||
-      data.category === 'Snacks' ||
-      data.category === 'Merch'
-        ? data.category
-        : 'Food',
+    category,
     description: typeof data.description === 'string' ? data.description : '',
+    imageUrl: resolveProductImage({ id, name, category, imageUrl: rawImageUrl }),
     active: Boolean(data.active),
     createdAt: data.createdAt,
     updatedAt: data.updatedAt,

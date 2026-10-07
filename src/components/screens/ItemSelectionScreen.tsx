@@ -2,10 +2,10 @@ import React, { useMemo, useState } from 'react';
 import { FilterCategory, OrderItem, Product } from '../../types/pos';
 import { ProductCard } from '../ui/ProductCard';
 import { CartOrderRow } from '../ui/CartOrderRow';
+import { ProgressIndicator } from '../ui/ProgressIndicator';
 import { formatCurrency } from '../../utils/currency';
 import {
   ShoppingBag,
-  ArrowRight,
   RotateCcw,
   RefreshCw,
   AlertTriangle,
@@ -29,7 +29,13 @@ interface ItemSelectionScreenProps {
   onProceedToSummary: () => void;
 }
 
-const CATEGORIES: FilterCategory[] = ['All', 'Drinks', 'Food', 'Snacks', 'Merch'];
+const CATEGORY_TABS: { value: FilterCategory; label: string }[] = [
+  { value: 'All', label: 'Show All' },
+  { value: 'Drinks', label: 'Cold & Hot Drinks' },
+  { value: 'Snacks', label: 'Snack Time' },
+  { value: 'Food', label: 'Hot Meals' },
+  { value: 'Merch', label: 'University Merch' },
+];
 
 export const ItemSelectionScreen: React.FC<ItemSelectionScreenProps> = ({
   products,
@@ -70,36 +76,38 @@ export const ItemSelectionScreen: React.FC<ItemSelectionScreenProps> = ({
   }, [products, selectedCategory, searchTerm]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-      {/* Left Column: Product Catalog */}
-      <div className="lg:col-span-8 flex flex-col gap-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200">
+    <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_400px] xl:grid-cols-[1fr_430px] lg:overflow-hidden min-h-[calc(100vh-88px)]">
+      {/* Left Scrollable Catalog Area */}
+      <div className="p-6 sm:p-10 lg:p-12 lg:overflow-y-auto">
+        {/* Hero Block */}
+        <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            <ProgressIndicator currentStage="ITEM_SELECTION" variant="inline" />
+            <h1 className="handwritten text-6xl sm:text-7xl font-bold text-[#252422] leading-[0.85] mt-2 mb-3">
               Select Items
             </h1>
-            <p className="text-sm text-slate-500 mt-0.5">
-              Tap any product card below to add it to your current order.
+            <p className="text-base font-medium text-[#403d39]/80">
+              Tap the cards to add them to your tray.
             </p>
           </div>
 
-          {/* Optional Search Input */}
-          <div className="relative w-full sm:w-64">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          {/* Search Input */}
+          <div className="relative w-full md:w-72">
+            <Search className="w-4 h-4 text-[#403d39] absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Filter items..."
+              placeholder="Search items..."
               aria-label="Filter products by name"
-              className="w-full min-h-[44px] pl-10 pr-9 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-700 focus:bg-white transition-colors"
+              className="w-full min-h-[46px] pl-11 pr-9 py-2 bg-white border-2 border-[#252422] rounded-2xl text-sm font-medium text-[#252422] placeholder:text-[#403d39]/50 focus:outline-none focus:ring-2 focus:ring-[#eb5e28]"
             />
             {searchTerm && (
               <button
                 type="button"
                 onClick={() => setSearchTerm('')}
                 aria-label="Clear filter"
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-lg text-[#403d39] hover:text-[#252422]"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -107,28 +115,24 @@ export const ItemSelectionScreen: React.FC<ItemSelectionScreenProps> = ({
           </div>
         </div>
 
-        {/* Category Segmented Filter Controls */}
+        {/* Category Filter Bar */}
         <div
-          className="flex items-center gap-2 overflow-x-auto pb-1"
+          className="flex items-center gap-3 my-7 overflow-x-auto pb-2"
           role="tablist"
           aria-label="Product Categories"
         >
-          {CATEGORIES.map((category) => {
-            const active = selectedCategory === category;
+          {CATEGORY_TABS.map((tab) => {
+            const active = selectedCategory === tab.value;
             return (
               <button
-                key={category}
+                key={tab.value}
                 type="button"
                 role="tab"
                 aria-selected={active}
-                onClick={() => setSelectedCategory(category)}
-                className={`min-h-[48px] px-5 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
-                  active
-                    ? 'bg-emerald-700 text-white shadow-xs'
-                    : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
-                }`}
+                onClick={() => setSelectedCategory(tab.value)}
+                className={`ink-pill min-h-[46px] text-sm ${active ? 'active' : ''}`}
               >
-                {category}
+                {tab.label}
               </button>
             );
           })}
@@ -136,36 +140,36 @@ export const ItemSelectionScreen: React.FC<ItemSelectionScreenProps> = ({
 
         {/* Product Grid States: Loading, Error, Empty, or Cards */}
         {loadingProducts ? (
-          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
-            <div className="w-10 h-10 border-3 border-emerald-700 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <h2 className="text-lg font-bold text-slate-900">
-              Loading Campus Store Catalog...
+          <div className="ink-card p-12 text-center">
+            <div className="w-10 h-10 border-3 border-[#eb5e28] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <h2 className="handwritten text-3xl font-bold text-[#252422]">
+              Loading Ate &amp; Served Catalog...
             </h2>
-            <p className="text-sm text-slate-500 mt-1">
+            <p className="text-sm font-mono text-[#403d39] mt-1">
               Connecting to Cloud Firestore product database.
             </p>
           </div>
         ) : productsError ? (
-          <div className="bg-red-50 rounded-2xl border border-red-200 p-8 text-center">
-            <AlertTriangle className="w-10 h-10 text-red-600 mx-auto mb-3" />
-            <h2 className="text-lg font-bold text-red-950">
+          <div className="ink-card bg-[#fff0eb] p-8 text-center">
+            <AlertTriangle className="w-10 h-10 text-[#eb5e28] mx-auto mb-3" />
+            <h2 className="handwritten text-3xl font-bold text-[#252422]">
               Unable to load products. Please try again.
             </h2>
-            <p className="text-sm text-red-800 mt-1 max-w-md mx-auto">
+            <p className="text-sm font-mono text-[#403d39] mt-1 max-w-md mx-auto">
               {productsError}
             </p>
             <button
               type="button"
               onClick={onRetryLoadProducts}
-              className="mt-5 min-h-[48px] px-6 py-2.5 rounded-xl bg-red-700 text-white text-sm font-semibold hover:bg-red-800 active:scale-95 transition-all inline-flex items-center gap-2 cursor-pointer"
+              className="mt-5 min-h-[48px] px-6 py-2.5 rounded-2xl ink-btn-accent font-mono text-xs font-bold uppercase inline-flex items-center gap-2 cursor-pointer"
             >
               <RefreshCw className="w-4 h-4" />
               Retry Database Connection
             </button>
           </div>
         ) : filteredProducts.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
-            <p className="text-base font-semibold text-slate-700">
+          <div className="ink-card p-12 text-center">
+            <p className="handwritten text-3xl font-bold text-[#252422]">
               No products match the current filter.
             </p>
             <button
@@ -174,13 +178,13 @@ export const ItemSelectionScreen: React.FC<ItemSelectionScreenProps> = ({
                 setSelectedCategory('All');
                 setSearchTerm('');
               }}
-              className="mt-4 min-h-[44px] px-5 py-2 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition-colors cursor-pointer"
+              className="mt-4 min-h-[46px] px-6 py-2 rounded-2xl bg-[#252422] text-white font-mono text-xs font-bold uppercase cursor-pointer"
             >
               Show All Products
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredProducts.map((product) => (
               <ProductCard
                 key={product.id}
@@ -193,50 +197,44 @@ export const ItemSelectionScreen: React.FC<ItemSelectionScreenProps> = ({
         )}
       </div>
 
-      {/* Right Column: Current Order / Cart Summary Panel */}
-      <aside className="lg:col-span-4 lg:sticky lg:top-6 bg-white rounded-2xl border border-slate-200 p-5 flex flex-col shadow-xs">
-        <div className="flex items-center justify-between gap-2 pb-4 border-b border-slate-200">
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200/70 flex items-center justify-center text-emerald-700">
-              <ShoppingBag className="w-5 h-5" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-slate-900 leading-tight">
-                Current Order
-              </h2>
-              <p className="text-xs font-mono text-slate-500 tabular-nums">
-                {totalItemCount} {totalItemCount === 1 ? 'item' : 'items'} selected
-              </p>
-            </div>
+      {/* Right Sidebar: Your Order */}
+      <aside className="bg-white border-t-[3px] lg:border-t-0 lg:border-l-[3px] border-[#252422] p-6 sm:p-8 flex flex-col justify-between lg:h-full lg:overflow-hidden">
+        {/* Cart Header */}
+        <div className="text-center pb-5 border-b-2 border-[#252422]/15 relative">
+          <div className="w-16 h-16 bg-[#fffcf2] rounded-full border-2 border-[#252422] flex items-center justify-center mx-auto mb-3 shadow-[3px_3px_0_#252422]">
+            <ShoppingBag className="w-8 h-8 text-[#252422]" />
           </div>
+          <h2 className="handwritten text-4xl font-bold text-[#252422] leading-none">
+            Your Order
+          </h2>
+          <p className="font-mono text-xs uppercase tracking-widest text-[#403d39]/70 mt-1 tabular-nums">
+            {totalItemCount} {totalItemCount === 1 ? 'ITEM' : 'ITEMS'} SELECTED
+          </p>
 
           {cartItems.length > 0 && (
             <button
               type="button"
               onClick={onClearCart}
-              className="min-h-[40px] px-3 rounded-xl text-xs font-semibold text-slate-600 hover:text-red-700 hover:bg-red-50 transition-colors inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+              className="mt-3 min-h-[38px] px-3 py-1 rounded-xl border-2 border-[#252422] bg-[#fffcf2] text-xs font-mono font-bold text-[#252422] hover:bg-[#fff0eb] inline-flex items-center gap-1.5 cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              Clear
+              Clear Tray
             </button>
           )}
         </div>
 
         {/* Cart Items List or Empty State */}
         {cartItems.length === 0 ? (
-          <div className="py-12 px-4 text-center flex flex-col items-center justify-center">
-            <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
-              <ShoppingBag className="w-7 h-7" />
-            </div>
-            <p className="text-base font-bold text-slate-800">
-              Your cart is empty
+          <div className="flex-1 py-12 px-4 flex flex-col items-center justify-center text-center opacity-50">
+            <p className="handwritten text-3xl font-bold text-[#252422]">
+              Cart is feeling light!
             </p>
-            <p className="text-xs text-slate-500 mt-1 max-w-[220px] leading-relaxed">
-              Tap any product card on the left to add items to your order.
+            <p className="text-sm text-[#403d39] mt-1">
+              Pick some goodies from the left.
             </p>
           </div>
         ) : (
-          <div className="max-h-[380px] overflow-y-auto divide-y divide-slate-100 pr-1 my-1">
+          <div className="flex-1 overflow-y-auto my-4 pr-1 divide-y divide-transparent">
             {cartItems.map((item) => (
               <CartOrderRow
                 key={item.productId}
@@ -249,36 +247,37 @@ export const ItemSelectionScreen: React.FC<ItemSelectionScreenProps> = ({
           </div>
         )}
 
-        {/* Order Totals & Proceed Action */}
-        <div className="pt-4 mt-2 border-t border-slate-200 flex flex-col gap-4">
-          <div className="flex items-center justify-between text-sm text-slate-600">
-            <span>Items in Order</span>
-            <span className="font-mono font-semibold text-slate-900 tabular-nums">
+        {/* Order Summary Footer */}
+        <div className="pt-6 border-t-2 border-dashed border-[#252422]">
+          <div className="flex items-center justify-between mb-2">
+            <span className="kiosk-label">Subtotal</span>
+            <span className="font-mono font-bold text-sm text-[#252422] tabular-nums">
+              {formatCurrency(totalAmountCentavos)}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between mb-2">
+            <span className="kiosk-label">Items</span>
+            <span className="font-mono font-bold text-sm text-[#252422] tabular-nums">
               {totalItemCount}
             </span>
           </div>
 
-          <div className="flex items-baseline justify-between">
-            <span className="text-base font-bold text-slate-900">
-              Total Amount
-            </span>
-            <span className="text-2xl font-mono font-bold text-emerald-800 tabular-nums">
-              {formatCurrency(totalAmountCentavos)}
-            </span>
+          <div className="font-mono text-4xl font-bold text-[#eb5e28] text-right my-4 tabular-nums">
+            {formatCurrency(totalAmountCentavos)}
           </div>
 
           <button
             type="button"
             onClick={onProceedToSummary}
             disabled={cartItems.length === 0}
-            className={`w-full min-h-[56px] px-6 py-3.5 rounded-xl text-base font-bold flex items-center justify-center gap-2 transition-all whitespace-nowrap ${
+            className={`w-full py-4 px-6 rounded-[20px] handwritten text-3xl font-bold border-[3px] border-[#252422] shadow-[4px_4px_0_#252422] transition-all ${
               cartItems.length === 0
-                ? 'bg-slate-200 text-slate-500 cursor-not-allowed'
-                : 'bg-emerald-700 text-white hover:bg-emerald-800 active:scale-[0.99] shadow-sm cursor-pointer'
+                ? 'bg-[#eb5e28] text-white opacity-60 cursor-not-allowed'
+                : 'ink-btn-accent cursor-pointer'
             }`}
           >
-            <span>Review Order</span>
-            <ArrowRight className="w-5 h-5" />
+            Review Tray
           </button>
         </div>
       </aside>

@@ -42,7 +42,6 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
   const [loadingData, setLoadingData] = useState(false);
   const [adminError, setAdminError] = useState<string | null>(null);
 
-  // New Product Form State
   const [newProdName, setNewProdName] = useState('');
   const [newProdPricePesos, setNewProdPricePesos] = useState('');
   const [newProdCategory, setNewProdCategory] = useState<ProductCategory>('Drinks');
@@ -176,20 +175,18 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs">
+      <div className="ink-card p-6 sm:p-8">
         {/* Top Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b-2 border-dashed border-[#252422]">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white">
-              <ShieldCheck className="w-6 h-6" />
+            <div className="w-14 h-14 rounded-2xl bg-[#252422] flex items-center justify-center text-[#fffcf2] shadow-[3px_3px_0_#eb5e28]">
+              <ShieldCheck className="w-7 h-7" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">
-                Cashier &amp; Admin Management
+              <span className="kiosk-label block">Protected Management</span>
+              <h1 className="handwritten text-4xl sm:text-5xl font-bold text-[#252422] leading-none">
+                Cashier &amp; Admin Portal
               </h1>
-              <p className="text-sm text-slate-500 mt-0.5">
-                Protected by Firebase Authentication &amp; Cloud Firestore Security Rules.
-              </p>
             </div>
           </div>
 
@@ -198,7 +195,7 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
               <button
                 type="button"
                 onClick={handleLogout}
-                className="min-h-[48px] px-4 py-2.5 rounded-xl bg-slate-100 text-slate-800 hover:bg-slate-200 text-sm font-bold inline-flex items-center gap-2 transition-colors cursor-pointer whitespace-nowrap"
+                className="min-h-[48px] px-4 py-2.5 rounded-xl ink-btn-secondary font-mono text-xs font-bold uppercase inline-flex items-center gap-2 cursor-pointer whitespace-nowrap"
               >
                 <LogOut className="w-4 h-4" />
                 <span>Sign Out</span>
@@ -207,7 +204,7 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="min-h-[48px] px-5 py-2.5 rounded-xl bg-emerald-700 text-white hover:bg-emerald-800 text-sm font-bold inline-flex items-center gap-2 transition-colors cursor-pointer whitespace-nowrap"
+              className="min-h-[48px] px-5 py-2.5 rounded-xl bg-[#252422] text-white hover:bg-[#403d39] font-mono text-xs font-bold uppercase inline-flex items-center gap-2 transition-colors cursor-pointer whitespace-nowrap"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Return to Kiosk</span>
@@ -218,16 +215,16 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
         {/* Auth Gate */}
         {!currentUser ? (
           <div className="py-12 text-center max-w-md mx-auto">
-            <h2 className="text-xl font-bold text-slate-900">
+            <h2 className="handwritten text-4xl font-bold text-[#252422]">
               Admin Authentication Required
             </h2>
-            <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+            <p className="text-sm text-[#403d39] mt-2 leading-relaxed">
               Normal kiosk customers do not need to sign in to place orders. Sign in with your authorized Google account to view Firestore transaction history or manage products.
             </p>
             <button
               type="button"
               onClick={handleGoogleLogin}
-              className="mt-6 min-h-[54px] px-8 py-3 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-base font-bold inline-flex items-center justify-center gap-2.5 transition-all shadow-sm cursor-pointer"
+              className="mt-6 min-h-[54px] px-8 py-3 rounded-2xl ink-btn-accent handwritten text-3xl font-bold inline-flex items-center justify-center gap-2.5 cursor-pointer"
             >
               <LogIn className="w-5 h-5" />
               <span>Sign In with Google</span>
@@ -235,11 +232,11 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
           </div>
         ) : !isAuthorizedAdmin ? (
           <div className="py-10 text-center max-w-lg mx-auto">
-            <AlertCircle className="w-10 h-10 text-amber-600 mx-auto mb-3" />
-            <h2 className="text-lg font-bold text-slate-900">
+            <AlertCircle className="w-10 h-10 text-[#eb5e28] mx-auto mb-3" />
+            <h2 className="handwritten text-3xl font-bold text-[#252422]">
               Signed in as {currentUser.email}
             </h2>
-            <p className="text-sm text-slate-600 mt-1">
+            <p className="text-sm font-mono text-[#403d39] mt-1">
               This account does not have Administrator privileges in Firestore rules (`{BOOTSTRAPPED_ADMIN_EMAIL}`).
             </p>
           </div>
@@ -247,27 +244,21 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
           <div className="mt-6">
             {/* Summary Metrics */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <span className="text-xs font-medium text-slate-500 block">
-                  Completed Transactions
-                </span>
-                <span className="text-2xl font-mono font-bold text-slate-900 tabular-nums mt-1 block">
+              <div className="bg-[#fffcf2] p-4 rounded-2xl border-2 border-[#252422]">
+                <span className="kiosk-label block">Completed Transactions</span>
+                <span className="text-2xl font-mono font-bold text-[#252422] tabular-nums mt-1 block">
                   {transactions.length}
                 </span>
               </div>
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <span className="text-xs font-medium text-slate-500 block">
-                  Total Recorded Sales
-                </span>
-                <span className="text-2xl font-mono font-bold text-emerald-800 tabular-nums mt-1 block">
+              <div className="bg-[#fffcf2] p-4 rounded-2xl border-2 border-[#252422]">
+                <span className="kiosk-label block">Total Recorded Sales</span>
+                <span className="text-2xl font-mono font-bold text-[#eb5e28] tabular-nums mt-1 block">
                   {formatCurrency(totalSalesCentavos)}
                 </span>
               </div>
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <span className="text-xs font-medium text-slate-500 block">
-                  Catalog Products
-                </span>
-                <span className="text-2xl font-mono font-bold text-slate-900 tabular-nums mt-1 block">
+              <div className="bg-[#fffcf2] p-4 rounded-2xl border-2 border-[#252422]">
+                <span className="kiosk-label block">Catalog Products</span>
+                <span className="text-2xl font-mono font-bold text-[#252422] tabular-nums mt-1 block">
                   {adminProducts.filter((p) => p.active).length} active / {adminProducts.length} total
                 </span>
               </div>
@@ -275,14 +266,12 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
 
             {/* Tabs & Refresh */}
             <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-              <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
+              <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={() => setActiveTab('transactions')}
-                  className={`min-h-[44px] px-4 py-2 rounded-lg text-sm font-bold inline-flex items-center gap-2 transition-colors cursor-pointer ${
-                    activeTab === 'transactions'
-                      ? 'bg-white text-slate-900 shadow-2xs'
-                      : 'text-slate-600 hover:text-slate-900'
+                  className={`ink-pill text-sm inline-flex items-center gap-2 ${
+                    activeTab === 'transactions' ? 'active' : ''
                   }`}
                 >
                   <Receipt className="w-4 h-4" />
@@ -291,10 +280,8 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveTab('products')}
-                  className={`min-h-[44px] px-4 py-2 rounded-lg text-sm font-bold inline-flex items-center gap-2 transition-colors cursor-pointer ${
-                    activeTab === 'products'
-                      ? 'bg-white text-slate-900 shadow-2xs'
-                      : 'text-slate-600 hover:text-slate-900'
+                  className={`ink-pill text-sm inline-flex items-center gap-2 ${
+                    activeTab === 'products' ? 'active' : ''
                   }`}
                 >
                   <Package className="w-4 h-4" />
@@ -306,7 +293,7 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
                 type="button"
                 onClick={loadAdminData}
                 disabled={loadingData}
-                className="min-h-[44px] px-4 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 text-sm font-semibold inline-flex items-center gap-2 transition-colors cursor-pointer"
+                className="min-h-[44px] px-4 py-2 rounded-xl ink-btn-secondary font-mono text-xs font-bold uppercase inline-flex items-center gap-2 cursor-pointer"
               >
                 <RefreshCw className={`w-4 h-4 ${loadingData ? 'animate-spin' : ''}`} />
                 <span>Refresh Firestore</span>
@@ -314,23 +301,23 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
             </div>
 
             {adminError && (
-              <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-sm text-red-900 flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
+              <div className="mb-6 p-4 rounded-2xl bg-[#fff0eb] border-2 border-[#252422] text-sm font-mono font-bold text-[#252422] flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-[#eb5e28] shrink-0" />
                 <span>{adminError}</span>
               </div>
             )}
 
             {/* Tab 1: Transaction History */}
             {activeTab === 'transactions' && (
-              <div className="overflow-x-auto border border-slate-200 rounded-xl">
+              <div className="overflow-x-auto border-2 border-[#252422] rounded-2xl">
                 {transactions.length === 0 ? (
-                  <div className="p-8 text-center text-sm text-slate-500">
+                  <div className="p-8 text-center font-mono text-sm text-[#403d39]">
                     No completed transactions recorded in Firestore yet.
                   </div>
                 ) : (
                   <table className="w-full text-left border-collapse text-sm">
                     <thead>
-                      <tr className="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500">
+                      <tr className="bg-[#fffcf2] border-b-2 border-[#252422] font-mono text-xs uppercase text-[#403d39]">
                         <th className="py-3 px-4">Transaction No.</th>
                         <th className="py-3 px-4">Date / Time</th>
                         <th className="py-3 px-4">Payment Method</th>
@@ -340,28 +327,28 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
                         <th className="py-3 px-4">Status</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y-2 divide-dashed divide-[#252422]/20 font-mono text-xs">
                       {transactions.map((tx) => (
                         <tr key={tx.transactionId}>
-                          <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
+                          <td className="py-3.5 px-4 font-bold text-[#252422]">
                             {tx.transactionId}
                           </td>
-                          <td className="py-3.5 px-4 text-slate-600">
+                          <td className="py-3.5 px-4 text-[#403d39]">
                             {formatDateTime(tx.createdAtIso)}
                           </td>
-                          <td className="py-3.5 px-4 font-semibold text-slate-800">
+                          <td className="py-3.5 px-4 font-bold text-[#252422]">
                             {tx.paymentMethod}
                           </td>
-                          <td className="py-3.5 px-4 text-right font-mono font-bold text-slate-900 tabular-nums">
+                          <td className="py-3.5 px-4 text-right font-bold text-[#252422] tabular-nums">
                             {formatCurrency(tx.totalAmountCentavos)}
                           </td>
-                          <td className="py-3.5 px-4 text-right font-mono text-slate-700 tabular-nums">
+                          <td className="py-3.5 px-4 text-right text-[#403d39] tabular-nums">
                             {formatCurrency(tx.amountPaidCentavos)}
                           </td>
-                          <td className="py-3.5 px-4 text-right font-mono text-slate-700 tabular-nums">
+                          <td className="py-3.5 px-4 text-right text-[#403d39] tabular-nums">
                             {formatCurrency(tx.changeCentavos)}
                           </td>
-                          <td className="py-3.5 px-4 font-semibold text-emerald-700">
+                          <td className="py-3.5 px-4 font-bold text-[#eb5e28]">
                             {tx.status}
                           </td>
                         </tr>
@@ -377,14 +364,14 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 <form
                   onSubmit={handleCreateProduct}
-                  className="lg:col-span-4 bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col gap-3.5 h-fit"
+                  className="lg:col-span-4 bg-[#fffcf2] p-5 rounded-2xl border-2 border-[#252422] flex flex-col gap-3.5 h-fit"
                 >
-                  <h3 className="text-base font-bold text-slate-900">
+                  <h3 className="handwritten text-3xl font-bold text-[#252422]">
                     Add New Product
                   </h3>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">
+                    <label className="block kiosk-label mb-1">
                       Product Name
                     </label>
                     <input
@@ -394,13 +381,13 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
                       value={newProdName}
                       onChange={(e) => setNewProdName(e.target.value)}
                       placeholder="e.g. Iced Matcha Latte"
-                      className="w-full min-h-[44px] px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm"
+                      className="w-full min-h-[44px] px-3 py-2 bg-white border-2 border-[#252422] rounded-xl text-sm"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-600 mb-1">
+                      <label className="block kiosk-label mb-1">
                         Price (₱)
                       </label>
                       <input
@@ -411,18 +398,18 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
                         value={newProdPricePesos}
                         onChange={(e) => setNewProdPricePesos(e.target.value)}
                         placeholder="55.00"
-                        className="w-full min-h-[44px] px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm font-mono"
+                        className="w-full min-h-[44px] px-3 py-2 bg-white border-2 border-[#252422] rounded-xl text-sm font-mono"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-600 mb-1">
+                      <label className="block kiosk-label mb-1">
                         Category
                       </label>
                       <select
                         value={newProdCategory}
                         onChange={(e) => setNewProdCategory(e.target.value as ProductCategory)}
-                        className="w-full min-h-[44px] px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm"
+                        className="w-full min-h-[44px] px-3 py-2 bg-white border-2 border-[#252422] rounded-xl text-sm"
                       >
                         <option value="Drinks">Drinks</option>
                         <option value="Food">Food</option>
@@ -433,7 +420,7 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">
+                    <label className="block kiosk-label mb-1">
                       Description
                     </label>
                     <input
@@ -442,24 +429,24 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
                       value={newProdDescription}
                       onChange={(e) => setNewProdDescription(e.target.value)}
                       placeholder="Short item description"
-                      className="w-full min-h-[44px] px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm"
+                      className="w-full min-h-[44px] px-3 py-2 bg-white border-2 border-[#252422] rounded-xl text-sm"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={submittingProduct}
-                    className="mt-2 min-h-[48px] px-4 py-2.5 rounded-xl bg-emerald-700 text-white hover:bg-emerald-800 text-sm font-bold inline-flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                    className="mt-2 min-h-[48px] px-4 py-2.5 rounded-xl ink-btn-accent handwritten text-2xl font-bold inline-flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-5 h-5" />
                     <span>{submittingProduct ? 'Saving...' : 'Add Product'}</span>
                   </button>
                 </form>
 
-                <div className="lg:col-span-8 overflow-x-auto border border-slate-200 rounded-xl">
+                <div className="lg:col-span-8 overflow-x-auto border-2 border-[#252422] rounded-2xl">
                   <table className="w-full text-left border-collapse text-sm">
                     <thead>
-                      <tr className="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500">
+                      <tr className="bg-[#fffcf2] border-b-2 border-[#252422] font-mono text-xs uppercase text-[#403d39]">
                         <th className="py-3 px-4">Product</th>
                         <th className="py-3 px-4">Category</th>
                         <th className="py-3 px-4 text-right">Price</th>
@@ -467,30 +454,30 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
                         <th className="py-3 px-4 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y-2 divide-dashed divide-[#252422]/20">
                       {adminProducts.map((prod) => (
                         <tr key={prod.id}>
-                          <td className="py-3.5 px-4 font-bold text-slate-900">
+                          <td className="py-3.5 px-4 handwritten text-2xl font-bold text-[#252422]">
                             {prod.name}
                           </td>
-                          <td className="py-3.5 px-4 text-slate-600">{prod.category}</td>
-                          <td className="py-3.5 px-4 text-right font-mono font-bold text-slate-900 tabular-nums">
+                          <td className="py-3.5 px-4 font-mono text-xs text-[#403d39]">{prod.category}</td>
+                          <td className="py-3.5 px-4 text-right font-mono font-bold text-[#252422] tabular-nums">
                             {formatCurrency(prod.priceCentavos)}
                           </td>
                           <td className="py-3.5 px-4">
                             <span
-                              className={`text-xs font-semibold ${
-                                prod.active ? 'text-emerald-700' : 'text-slate-400'
+                              className={`text-xs font-mono font-bold ${
+                                prod.active ? 'text-[#eb5e28]' : 'text-[#403d39]/50'
                               }`}
                             >
-                              {prod.active ? 'Active' : 'Inactive'}
+                              {prod.active ? 'ACTIVE' : 'INACTIVE'}
                             </span>
                           </td>
                           <td className="py-3.5 px-4 text-right space-x-2 whitespace-nowrap">
                             <button
                               type="button"
                               onClick={() => handleToggleProduct(prod)}
-                              className="min-h-[38px] px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-800 cursor-pointer"
+                              className="min-h-[38px] px-3 py-1.5 rounded-xl border-2 border-[#252422] bg-[#fffcf2] hover:bg-[#fff0eb] text-xs font-mono font-bold text-[#252422] cursor-pointer"
                             >
                               {prod.active ? 'Deactivate' : 'Activate'}
                             </button>
@@ -498,7 +485,7 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
                               type="button"
                               onClick={() => handleDeleteProduct(prod)}
                               aria-label={`Delete ${prod.name}`}
-                              className="min-h-[38px] px-2.5 py-1.5 rounded-lg text-red-700 hover:bg-red-50 text-xs font-semibold inline-flex items-center cursor-pointer"
+                              className="min-h-[38px] px-2.5 py-1.5 rounded-xl border-2 border-[#252422] text-[#eb5e28] hover:bg-[#fff0eb] text-xs font-mono font-bold inline-flex items-center cursor-pointer"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>

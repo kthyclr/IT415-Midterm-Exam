@@ -18,19 +18,19 @@ export const CartOrderRow: React.FC<CartOrderRowProps> = ({
   onRemove,
 }) => {
   return (
-    <div className="py-3.5 border-b border-slate-200/80 last:border-b-0 flex flex-col gap-2.5">
+    <div className="py-3.5 border-b-2 border-dashed border-[#252422]/30 last:border-b-0 flex flex-col gap-2.5">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <h4 className="text-base font-bold text-slate-900 leading-tight">
+          <h4 className="handwritten text-2xl font-bold text-[#252422] leading-none">
             {item.productName}
           </h4>
-          <p className="text-xs font-mono text-slate-500 mt-0.5 tabular-nums">
+          <p className="text-xs font-mono text-[#403d39] mt-1 tabular-nums">
             {formatCurrency(item.unitPriceCentavos)} each
           </p>
         </div>
 
         <div className="text-right">
-          <span className="text-base font-mono font-bold text-slate-900 tabular-nums block">
+          <span className="text-base font-mono font-bold text-[#252422] bg-[#fff0eb] px-2.5 py-0.5 rounded-lg border border-[#252422] tabular-nums inline-block">
             {formatCurrency(item.subtotalCentavos)}
           </span>
         </div>
@@ -48,7 +48,7 @@ export const CartOrderRow: React.FC<CartOrderRowProps> = ({
           type="button"
           onClick={() => onRemove(item.productId)}
           aria-label={`Remove ${item.productName} from order`}
-          className="min-h-[44px] px-3 rounded-xl text-xs font-semibold text-red-700 hover:bg-red-50 active:scale-95 transition-all inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+          className="min-h-[44px] px-3 rounded-xl border-2 border-[#252422] bg-white text-xs font-mono font-bold text-[#eb5e28] hover:bg-[#fff0eb] active:translate-x-[1px] active:translate-y-[1px] transition-all inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
         >
           <Trash2 className="w-4 h-4" />
           Remove

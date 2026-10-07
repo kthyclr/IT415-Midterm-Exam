@@ -30,7 +30,6 @@ import {
   validateQuantityChange,
 } from './utils/validation';
 import { generateTransactionReference } from './utils/transactionId';
-import { ProgressIndicator } from './components/ui/ProgressIndicator';
 import { StatusBanner } from './components/ui/StatusBanner';
 import { ItemSelectionScreen } from './components/screens/ItemSelectionScreen';
 import { OrderSummaryScreen } from './components/screens/OrderSummaryScreen';
@@ -39,6 +38,7 @@ import { PaymentProcessingScreen } from './components/screens/PaymentProcessingS
 import { PaymentSuccessfulScreen } from './components/screens/PaymentSuccessfulScreen';
 import { ReceiptScreen } from './components/screens/ReceiptScreen';
 import { AdminPortalModal } from './components/screens/AdminPortalModal';
+import { BrandLogo } from './components/ui/BrandLogo';
 import { Maximize2, Minimize2, RotateCcw, Shield } from 'lucide-react';
 
 export default function App() {
@@ -362,96 +362,75 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900">
-      {/* 3-Zone Top Bar Contract */}
-      <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3.5 no-print">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          {/* Zone 1: Single text element Brand Wordmark */}
-          <a
-            href="#kiosk-top"
-            onClick={(e) => {
-              e.preventDefault();
-              setShowAdminPortal(false);
-            }}
-            className="text-xl font-bold tracking-tight text-slate-900 font-display whitespace-nowrap"
-          >
-            Campus Store POS
-          </a>
-
-          {/* Zone 2: Clean Text Navigation Links */}
-          <nav
-            className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600"
-            aria-label="Kiosk Navigation"
-          >
-            <button
-              type="button"
-              onClick={() => {
-                setShowAdminPortal(false);
-                if (stage === 'ORDER_SUMMARY' || stage === 'PAYMENT_METHOD') {
-                  setStage('ITEM_SELECTION');
-                }
-              }}
-              className="hover:text-slate-900 hover:underline underline-offset-4 transition-colors cursor-pointer whitespace-nowrap"
-            >
-              Self-Service Kiosk
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowAdminPortal(true)}
-              className="hover:text-slate-900 hover:underline underline-offset-4 transition-colors inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
-            >
-              <Shield className="w-4 h-4" />
-              <span>Cashier / Admin</span>
-            </button>
-          </nav>
-
-          {/* Zone 3: 1-2 Primary Actions */}
-          <div className="flex items-center gap-2.5">
-            <button
-              type="button"
-              onClick={() => setShowAdminPortal((prev) => !prev)}
-              className="md:hidden min-h-[44px] px-3.5 py-2 rounded-xl bg-slate-100 text-slate-800 hover:bg-slate-200 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap"
-            >
-              <Shield className="w-4 h-4" />
-              <span>{showAdminPortal ? 'Kiosk' : 'Admin'}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={toggleKioskFullscreen}
-              aria-label="Toggle Fullscreen Kiosk Mode"
-              className="min-h-[44px] px-3.5 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap"
-            >
-              {isFullscreen ? (
-                <Minimize2 className="w-4 h-4" />
-              ) : (
-                <Maximize2 className="w-4 h-4" />
-              )}
-              <span className="hidden sm:inline">
-                {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setShowAdminPortal(false);
-                handleStartNewTransaction();
-              }}
-              className="min-h-[44px] px-4 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 active:scale-95 text-xs font-bold inline-flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap"
-            >
-              <RotateCcw className="w-4 h-4" />
-              <span>New Transaction</span>
-            </button>
+    <div className="min-h-screen flex flex-col bg-[#fffcf2] text-[#252422]">
+      {/* Header matching Variation 3 */}
+      <header className="bg-[#fffcf2] border-b-[3px] border-[#252422] px-6 sm:px-12 py-5 flex items-center justify-between gap-4 no-print">
+        {/* Brand Logo */}
+        <a
+          href="#kiosk-top"
+          onClick={(e) => {
+            e.preventDefault();
+            setShowAdminPortal(false);
+          }}
+          className="inline-flex items-center gap-3 group whitespace-nowrap"
+        >
+          <div className="w-12 h-12 rounded-2xl bg-white border-2 border-[#252422] flex items-center justify-center shadow-[3px_3px_0_#252422] group-active:translate-x-[1px] group-active:translate-y-[1px] transition-transform">
+            <BrandLogo className="w-9 h-9" />
           </div>
+          <span className="handwritten text-4xl sm:text-[2.5rem] font-bold leading-none text-[#252422]">
+            Ate &amp; Served
+          </span>
+        </a>
+
+        {/* Navigation Controls */}
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setShowAdminPortal((prev) => !prev)}
+            title="Cashier / Admin Management"
+            aria-label="Cashier / Admin Management"
+            className={`h-11 px-3.5 border-2 border-[#252422] rounded-xl flex items-center justify-center gap-1.5 font-mono text-xs uppercase font-bold transition-colors cursor-pointer ${
+              showAdminPortal
+                ? 'bg-[#eb5e28] text-white'
+                : 'bg-white text-[#252422] hover:bg-[#fff0eb]'
+            }`}
+          >
+            <Shield className="w-4 h-4" />
+            <span className="hidden sm:inline">
+              {showAdminPortal ? 'Kiosk' : 'Admin'}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={toggleKioskFullscreen}
+            title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+            aria-label="Toggle Fullscreen Kiosk Mode"
+            className="w-11 h-11 border-2 border-[#252422] rounded-xl flex items-center justify-center bg-white text-[#252422] hover:bg-[#fff0eb] transition-colors cursor-pointer"
+          >
+            {isFullscreen ? (
+              <Minimize2 className="w-5 h-5" />
+            ) : (
+              <Maximize2 className="w-5 h-5" />
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setShowAdminPortal(false);
+              handleStartNewTransaction();
+            }}
+            className="h-11 px-5 rounded-xl bg-[#252422] text-white hover:bg-[#403d39] active:translate-y-0.5 font-mono text-xs font-bold uppercase tracking-wider inline-flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>New Order</span>
+          </button>
         </div>
       </header>
 
-      {/* 5-Stage Visual Progress Indicator */}
-      {!showAdminPortal && <ProgressIndicator currentStage={stage} />}
-
       {/* Main Content Area */}
-      <main className="flex-1">
+      <main className="flex-1 flex flex-col">
         {showAdminPortal ? (
           <AdminPortalModal
             currentUser={currentUser}

@@ -22,11 +22,11 @@ export const PaymentMethodCard: React.FC<PaymentMethodCardProps> = ({
   const renderIcon = () => {
     switch (method) {
       case 'Cash':
-        return <Banknote className="w-8 h-8 text-emerald-700" />;
+        return <Banknote className="w-8 h-8 text-[#eb5e28]" />;
       case 'QR Payment':
-        return <QrCode className="w-8 h-8 text-emerald-700" />;
+        return <QrCode className="w-8 h-8 text-[#eb5e28]" />;
       case 'Credit/Debit Card':
-        return <CreditCard className="w-8 h-8 text-emerald-700" />;
+        return <CreditCard className="w-8 h-8 text-[#eb5e28]" />;
     }
   };
 
@@ -34,31 +34,31 @@ export const PaymentMethodCard: React.FC<PaymentMethodCardProps> = ({
     <button
       type="button"
       onClick={() => onSelect(method)}
-      className={`w-full text-left rounded-2xl p-6 transition-all duration-150 active:scale-[0.99] flex flex-col justify-between min-h-[210px] cursor-pointer border ${
-        selected
-          ? 'bg-emerald-50/50 border-emerald-700 ring-2 ring-emerald-700/20 shadow-sm'
-          : 'bg-white border-slate-200 hover:border-slate-300 shadow-2xs'
+      className={`ink-card-interactive w-full text-left p-6 flex flex-col justify-between min-h-[230px] cursor-pointer ${
+        selected ? 'bg-[#fff0eb] ring-3 ring-[#eb5e28]' : 'bg-white'
       }`}
     >
       <div>
         <div className="flex items-center justify-between gap-3 mb-4">
-          <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200/70 flex items-center justify-center">
+          <div className="w-14 h-14 rounded-2xl bg-[#fffcf2] border-2 border-[#252422] flex items-center justify-center shadow-[3px_3px_0_#252422]">
             {renderIcon()}
           </div>
-          <span className="text-xs font-mono font-medium text-slate-500">
-            {subtitle}
-          </span>
+          <span className="kiosk-label">{subtitle}</span>
         </div>
 
-        <h3 className="text-xl font-bold text-slate-900">{title}</h3>
-        <p className="text-sm text-slate-600 mt-2 leading-relaxed">{description}</p>
+        <h3 className="handwritten text-3xl font-bold text-[#252422] leading-none">
+          {title}
+        </h3>
+        <p className="text-sm text-[#403d39] mt-2.5 leading-relaxed">
+          {description}
+        </p>
       </div>
 
-      <div className="pt-4 mt-5 border-t border-slate-100 flex items-center justify-between">
-        <span className="text-sm font-semibold text-emerald-800">
+      <div className="pt-4 mt-5 border-t-2 border-dashed border-[#252422]/30 flex items-center justify-between">
+        <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#252422]">
           Select {title}
         </span>
-        <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700">
+        <div className="w-10 h-10 rounded-xl bg-[#252422] text-white flex items-center justify-center">
           <ChevronRight className="w-5 h-5" />
         </div>
       </div>
