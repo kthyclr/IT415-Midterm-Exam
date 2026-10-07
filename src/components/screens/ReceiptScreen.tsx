@@ -46,6 +46,12 @@ export const ReceiptScreen: React.FC<ReceiptScreenProps> = ({
             <span className="font-bold text-[#252422]">{transaction.transactionId}</span>
           </div>
           <div className="flex items-center justify-between gap-2">
+            <span className="text-[#403d39]">Order Type:</span>
+            <span className="font-bold text-[#eb5e28]">
+              {transaction.diningOption === 'Take-Out' ? 'TAKEOUT / TO-GO' : 'EAT IN / DINE-IN'}
+            </span>
+          </div>
+          <div className="flex items-center justify-between gap-2">
             <span className="text-[#403d39]">Date:</span>
             <span className="text-[#252422]">{formatDateTime(transaction.createdAtIso)}</span>
           </div>

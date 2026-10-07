@@ -12,6 +12,7 @@ import {
 } from './firebase/posService';
 import {
   CompletedTransaction,
+  DiningOption,
   KioskStage,
   OrderItem,
   PaymentMethod,
@@ -50,6 +51,7 @@ export default function App() {
   // 2. Authoritative Transaction / Cart State
   const [stage, setStage] = useState<KioskStage>('ITEM_SELECTION');
   const [cartItems, setCartItems] = useState<OrderItem[]>([]);
+  const [diningOption, setDiningOption] = useState<DiningOption>('Dine-In');
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<PaymentMethod | null>(null);
   const [cashInput, setCashInput] = useState<string>('');
@@ -270,6 +272,7 @@ export default function App() {
   // Complete Transaction Reset (New Transaction)
   const handleStartNewTransaction = useCallback(() => {
     setCartItems([]);
+    setDiningOption('Dine-In');
     setSelectedPaymentMethod(null);
     setCashInput('');
     setCompletedTransaction(null);
@@ -343,6 +346,7 @@ export default function App() {
       items: snapshotItems,
       totalAmountCentavos,
       paymentMethod: selectedPaymentMethod,
+      diningOption,
       amountPaidCentavos,
       changeCentavos,
       status: 'Payment Successful',
@@ -463,6 +467,8 @@ export default function App() {
                 cartItems={cartItems}
                 totalAmountCentavos={totalAmountCentavos}
                 totalItemCount={totalItemCount}
+                diningOption={diningOption}
+                onChangeDiningOption={setDiningOption}
                 onBackToSelection={handleBackToSelection}
                 onContinueToPayment={handleContinueToPaymentMethod}
               />
