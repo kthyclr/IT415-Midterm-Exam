@@ -28,7 +28,7 @@ The application connects to Firebase via `firebase-applet-config.json` (initiali
 
 - **Collections**:
   - `/products/{productId}`: Stores active and inactive kiosk catalog items (`id`, `name`, `priceCentavos`, `category`, `description`, `active`, `createdAt`, `updatedAt`).
-  - `/transactions/{transactionId}`: Stores immutable snapshots of completed transactions (`transactionId`, `createdAt`, `createdAtIso`, `itemCount`, `items`, `totalAmountCentavos`, `paymentMethod`, `amountPaidCentavos`, `changeCentavos`, `status`).
+  - `/transactions/{transactionId}`: Stores immutable snapshots of completed transactions (`transactionId`, `createdAt`, `createdAtIso`, `itemCount`, `items`, `totalAmountCentavos`, `paymentMethod`, `diningOption`, `amountPaidCentavos`, `changeCentavos`, `status`).
   - `/admins/{adminId}`: Stores optional authorized admin UIDs.
 - **Security Rules**:
   - Public kiosk users can read active products and create validated completed transactions.
@@ -110,7 +110,7 @@ The application connects to Firebase via `firebase-applet-config.json` (initiali
 
 - **Touchscreen Item Selection**: Large tappable product cards, category filtering (`All`, `Drinks`, `Food`, `Snacks`, `Merch`), search bar, and live cart panel.
 - **Exact Monetary Math**: All prices, item subtotals, order totals, cash tendered, and change amounts are computed in integer centavos to prevent floating-point errors.
-- **Order Summary & State Preservation**: Dedicated review screen with `Back / Modify Order` preserving all selected items and quantities.
+- **Order Summary & Dining Option**: Dedicated review screen with **Eat In / Dine-In** vs. **Takeout / To-Go** selection and `Back / Modify Order` preserving all selected items and quantities.
 - **Cash Payment Validation**: Includes touchscreen numeric keypad, quick bill buttons (`Exact`, `₱50`, `₱100`, `₱200`, `₱500`, `₱1000`), and strict rejection of blank, non-numeric, negative, or insufficient cash inputs.
 - **Simulated QR Payment**: Generates a deterministic SVG QR code for the current order total. Pressing `Confirm Payment` simulates payment verification with `amountPaid = total` and `change = ₱0.00`.
 - **Simulated Credit/Debit Card Payment**: Displays contactless terminal instructions (`Please tap, insert, or swipe your card.`) and a brief `Processing payment...` state before completing the transaction with `amountPaid = total` and `change = ₱0.00`. No real card numbers, CVV, or PINs are collected.

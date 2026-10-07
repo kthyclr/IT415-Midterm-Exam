@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="c92ac240-9f0c-4dd8-bf0b-0818cd0e9eff" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/firebase-blueprint.json" beforeDir="false" afterPath="$PROJECT_DIR$/firebase-blueprint.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/firestore.rules" beforeDir="false" afterPath="$PROJECT_DIR$/firestore.rules" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/security_spec.md" beforeDir="false" afterPath="$PROJECT_DIR$/security_spec.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/screens/AdminPortalModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/screens/AdminPortalModal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/screens/OrderSummaryScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/screens/OrderSummaryScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/screens/PaymentSuccessfulScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/screens/PaymentSuccessfulScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/screens/ReceiptScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/screens/ReceiptScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/firebase/posService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/firebase/posService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/types/pos.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/pos.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "marvinkentumando"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/kthyclr/IT415-Midterm-Exam.git",
+    "accountId": "517582dd-e3a3-4774-b33b-810dc1664994"
+  }
+}]]></component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 0,
+  "fromUser": false
+}]]></component>
+  <component name="ProjectId" id="3KMOD2k1xkAUjGc2I7wTqF4I4lB" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "feature/eat-in-or-checkout",
+    "kotlin-language-version-configured": "true",
+    "show.migrate.to.gradle.popup": "false"
+  }
+}]]></component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c92ac240-9f0c-4dd8-bf0b-0818cd0e9eff" name="Changes" comment="" />
+      <created>1791363851699</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1791363851699</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

@@ -49,6 +49,13 @@ export const PaymentSuccessfulScreen: React.FC<PaymentSuccessfulScreenProps> = (
         {/* Authoritative Transaction Summary */}
         <div className="bg-white rounded-2xl border-2 border-[#252422] p-5 text-left divide-y-2 divide-dashed divide-[#252422]/20">
           <div className="py-2.5 flex items-center justify-between text-sm">
+            <span className="kiosk-label">Dining Option</span>
+            <span className="font-mono font-bold text-[#252422]">
+              {transaction.diningOption === 'Take-Out' ? 'Takeout / To-Go' : 'Eat In / Dine-In'}
+            </span>
+          </div>
+
+          <div className="py-2.5 flex items-center justify-between text-sm">
             <span className="kiosk-label">Payment Method</span>
             <span className="font-mono font-bold text-[#252422]">{transaction.paymentMethod}</span>
           </div>

@@ -320,6 +320,7 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
                       <tr className="bg-[#fffcf2] border-b-2 border-[#252422] font-mono text-xs uppercase text-[#403d39]">
                         <th className="py-3 px-4">Transaction No.</th>
                         <th className="py-3 px-4">Date / Time</th>
+                        <th className="py-3 px-4">Dining Option</th>
                         <th className="py-3 px-4">Payment Method</th>
                         <th className="py-3 px-4 text-right">Total</th>
                         <th className="py-3 px-4 text-right">Paid</th>
@@ -335,6 +336,9 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
                           </td>
                           <td className="py-3.5 px-4 text-[#403d39]">
                             {formatDateTime(tx.createdAtIso)}
+                          </td>
+                          <td className="py-3.5 px-4 font-bold text-[#252422]">
+                            {tx.diningOption === 'Take-Out' ? 'Takeout' : 'Dine-In'}
                           </td>
                           <td className="py-3.5 px-4 font-bold text-[#252422]">
                             {tx.paymentMethod}

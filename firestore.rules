@@ -88,6 +88,7 @@ service cloud.firestore {
           'items',
           'totalAmountCentavos',
           'paymentMethod',
+          'diningOption',
           'amountPaidCentavos',
           'changeCentavos',
           'status'
@@ -100,6 +101,7 @@ service cloud.firestore {
           'items',
           'totalAmountCentavos',
           'paymentMethod',
+          'diningOption',
           'amountPaidCentavos',
           'changeCentavos',
           'status'
@@ -116,6 +118,8 @@ service cloud.firestore {
         data.totalAmountCentavos is int && data.totalAmountCentavos > 0 && data.totalAmountCentavos <= 50000000 &&
         data.paymentMethod is string && data.paymentMethod.size() <= 30 &&
         data.paymentMethod in ['Cash', 'QR Payment', 'Credit/Debit Card'] &&
+        data.diningOption is string && data.diningOption.size() <= 20 &&
+        data.diningOption in ['Dine-In', 'Take-Out'] &&
         data.amountPaidCentavos is int && data.amountPaidCentavos > 0 && data.amountPaidCentavos <= 100000000 &&
         data.changeCentavos is int && data.changeCentavos >= 0 && data.changeCentavos <= 100000000 &&
         data.status is string && data.status.size() <= 30 && data.status == 'Payment Successful' &&

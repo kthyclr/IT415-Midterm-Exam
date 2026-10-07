@@ -86,6 +86,11 @@
           "enum": ["Cash", "QR Payment", "Credit/Debit Card"],
           "description": "Selected payment method."
         },
+        "diningOption": {
+          "type": "string",
+          "enum": ["Dine-In", "Take-Out"],
+          "description": "Selected dining option (Eat In or Takeout)."
+        },
         "amountPaidCentavos": {
           "type": "integer",
           "description": "Amount paid in integer centavos."
@@ -108,6 +113,7 @@
         "items",
         "totalAmountCentavos",
         "paymentMethod",
+        "diningOption",
         "amountPaidCentavos",
         "changeCentavos",
         "status"
