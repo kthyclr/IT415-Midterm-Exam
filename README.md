@@ -129,7 +129,7 @@ The application connects to Firebase via `firebase-applet-config.json` (initiali
 
 | Member Name | Role / Assigned Module | Feature Branch | Key Commits / PRs |
 | :--- | :--- | :--- | :--- |
-| Member 1 | Project Setup & Firebase Integration | `feature/project-setup`, `feature/firebase` | Initial setup, Firestore rules & persistence |
-| Member 2 | Touchscreen Kiosk UI & Cart Logic | `feature/kiosk-ui`, `feature/cart-logic` | Product cards, quantity controls, subtotals |
-| Member 3 | Order Summary & Payment Flows | `feature/order-summary`, `feature/payment-flow` | Summary screen, Cash validation, QR/Card simulation |
-| Member 4 | Receipt, Testing & Documentation | `feature/receipt`, `feature/documentation` | Digital receipt, acceptance tests, README & AI log |
+| Giverola, Aires Jhoy J.| Project Setup & Firebase Integration | `feature/project-setup`, `feature/firebase` | Initial setup, Firestore rules & persistence |
+| Laureto, Kathy Claire S.| Touchscreen Kiosk UI & Cart Logic | `feature/kiosk-ui`, `feature/cart-logic` | Product cards, quantity controls, subtotals |
+| Tumando, Marvin Ken P. | Order Summary & Payment Flows | `feature/order-summary`, `feature/payment-flow` | Summary screen, Cash validation, QR/Card simulation |
+| All| Receipt, Testing & Documentation | `feature/receipt`, `feature/documentation` | Digital receipt, acceptance tests, README & AI log |
